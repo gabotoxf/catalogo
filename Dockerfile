@@ -23,6 +23,10 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
+# Fix: desactivar MPMs conflictivos
+RUN a2dismod mpm_prefork mpm_worker || true && \
+    a2enmod mpm_event
+
 WORKDIR /var/www/html
 
 COPY backend/ ./
