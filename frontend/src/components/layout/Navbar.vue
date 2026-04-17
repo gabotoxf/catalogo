@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/auth'
 import { ShoppingCart, User, Search, Menu, X, ChevronDown, MapPin, Truck, Tag, Users, Info, Loader2, ArrowRight } from 'lucide-vue-next'
 import CartModal from './CartModal.vue'
 import api from '../../api/axios'
+import { getProductImageUrl } from '../../utils/helpers'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
@@ -80,11 +81,7 @@ const fetchCategories = async () => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = getProductImageUrl
 
 onMounted(() => {
   fetchCategories()

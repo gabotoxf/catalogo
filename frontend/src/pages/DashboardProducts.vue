@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../api/axios'
 import Skeleton from '../components/layout/Skeleton.vue'
+import { getProductImageUrl } from '../utils/helpers'
 import { 
   Plus, 
   Trash2, 
@@ -154,11 +155,7 @@ const deleteItem = async (id) => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = getProductImageUrl
 
 const route = useRoute()
 

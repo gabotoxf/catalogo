@@ -1,0 +1,20 @@
+# Git
+.git
+.gitignore
+
+# Frontend
+frontend/node_modules
+frontend/dist
+
+# Backend
+backend/vendor
+backend/storage/*.key
+backend/.env
+backend/public/hot
+backend/public/storage
+backend/tests
+backend/phpunit.xml
+
+# Docker
+dockerfile
+.dockerignore

@@ -46,11 +46,11 @@ const handleCheckout = () => {
   // Optionally clear cart or wait for user to return
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+import { getProductImageUrl } from '../utils/helpers'
+
+// ... existing code
+
+const getImageUrl = getProductImageUrl
 </script>
 
 <template>

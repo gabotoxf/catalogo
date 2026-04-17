@@ -10,6 +10,7 @@ import { ShoppingBag, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-vue-next
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../../stores/cart'
 import Skeleton from './Skeleton.vue'
+import { getProductImageUrl } from '../../utils/helpers'
 
 const props = defineProps({
   isOpen: Boolean
@@ -37,11 +38,7 @@ const goToCheckout = () => {
   handleClose()
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = getProductImageUrl
 </script>
 
 <template>

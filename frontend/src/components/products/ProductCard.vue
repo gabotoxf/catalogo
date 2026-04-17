@@ -1,6 +1,7 @@
 <script setup>
 import { ShoppingCart, Eye, Plus } from 'lucide-vue-next'
 import { useCartStore } from '../../stores/cart'
+import { getProductImageUrl } from '../../utils/helpers'
 
 const props = defineProps({
   product: {
@@ -15,11 +16,7 @@ const addToCart = () => {
   cartStore.addToCart(props.product)
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = getProductImageUrl
 </script>
 
 <template>

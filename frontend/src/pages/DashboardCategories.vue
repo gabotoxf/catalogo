@@ -2,6 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import api from '../api/axios'
 import Skeleton from '../components/layout/Skeleton.vue'
+import { getCategoryImageUrl } from '../utils/helpers'
 import { 
   Plus, 
   Trash2, 
@@ -135,11 +136,7 @@ const deleteItem = async (id) => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Categorias/${img}`
-}
+const getImageUrl = getCategoryImageUrl
 
 onMounted(fetchCategories)
 </script>
