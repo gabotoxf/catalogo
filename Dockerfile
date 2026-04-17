@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
 
 # Habilitar mod_rewrite de Apache para Laravel
 RUN a2enmod rewrite
+RUN a2dismod mpm_prefork
 
 # Configurar el directorio de trabajo
 WORKDIR /var/www/html
