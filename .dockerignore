@@ -16,5 +16,5 @@ backend/tests
 backend/phpunit.xml
 
 # Docker
-dockerfile
+Dockerfile
 .dockerignore
