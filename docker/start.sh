@@ -1,10 +1,9 @@
 #!/bin/sh
 # Production startup script for the PHP-FPM + Nginx container.
-# Runs once: migrations → config/route cache → starts both daemons.
+# Runs once: migrations → config/route cache → starts both daemons via supervisor.
 set -e
 
 APP_DIR="/var/www/html"
-PHP_FPM_CONF="/etc/php82/php-fpm.conf"
 NGINX_CONF="/etc/nginx/conf.d/default.conf"
 
 # ---------------------------------------------------------------------------
@@ -29,17 +28,7 @@ echo "[start] Caching Laravel routes..."
 php artisan route:cache
 
 # ---------------------------------------------------------------------------
-# 3. Start PHP-FPM in the background
+# 3. Start PHP-FPM and Nginx via supervisord (keeps the container alive)
 # ---------------------------------------------------------------------------
-echo "[start] Starting PHP-FPM..."
-php-fpm -F -R -y "${PHP_FPM_CONF}" &
-PHP_FPM_PID=$!
-
-# Give PHP-FPM a moment to create the socket before Nginx tries to connect
-sleep 1
-
-# ---------------------------------------------------------------------------
-# 4. Start Nginx in the foreground (keeps the container alive)
-# ---------------------------------------------------------------------------
-echo "[start] Starting Nginx on port ${PORT}..."
-exec nginx -g "daemon off;"
+echo "[start] Starting PHP-FPM and Nginx via supervisord..."
+exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

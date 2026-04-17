@@ -55,36 +55,15 @@ EXPOSE 9000
 # =============================================================================
 FROM nginx:alpine
 
-# Install PHP-FPM and all extensions needed by Laravel (Alpine packages)
-RUN apk add --no-cache \
-        php82 \
-        php82-pdo \
-        php82-pdo_mysql \
-        php82-mbstring \
-        php82-exif \
-        php82-pcntl \
-        php82-bcmath \
-        php82-gd \
-        php82-zip \
-        php82-intl \
-        php82-tokenizer \
-        php82-xml \
-        php82-xmlwriter \
-        php82-xmlreader \
-        php82-dom \
-        php82-fileinfo \
-        php82-openssl \
-        php82-session \
-        php82-ctype \
-        php82-curl \
-        php82-phar \
-        php82-iconv \
-        php82-sodium \
-        php82-fpm \
-    && ln -sf /usr/bin/php82 /usr/local/bin/php \
-    && ln -sf /usr/sbin/php-fpm82 /usr/local/sbin/php-fpm
+# Install supervisor to manage both PHP-FPM and Nginx processes
+RUN apk add --no-cache supervisor
 
 WORKDIR /var/www/html
+
+# Copy the entire PHP-FPM runtime (binary, extensions, config) from Stage 2
+COPY --from=php-fpm /usr/local /usr/local
+COPY --from=php-fpm /usr/lib /usr/lib
+COPY --from=php-fpm /etc/php* /etc/php/
 
 # Copy the full Laravel application (including vendor/) from the php-fpm stage
 COPY --from=php-fpm /var/www/html /var/www/html
@@ -93,14 +72,17 @@ COPY --from=php-fpm /var/www/html /var/www/html
 COPY --from=frontend-build /app/frontend/dist/ /var/www/html/public/
 
 # Fix ownership so nginx/php-fpm can read and write where needed
-RUN chown -R nginx:nginx /var/www/html/storage /var/www/html/bootstrap/cache \
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Nginx site configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 # PHP-FPM pool configuration (Unix socket, runs as nginx user)
-COPY docker/php-fpm.conf /etc/php82/php-fpm.d/www.conf
+COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
+# Supervisor configuration
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Startup script
 COPY docker/start.sh /start.sh
