@@ -1,4 +1,4 @@
-# --- Etapa 1: Construcción del Frontend ---
+# --- Etapa 1: Frontend ---
 FROM node:20-slim AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
@@ -6,10 +6,12 @@ RUN npm install
 COPY frontend/ ./
 RUN npm run build
 
-# --- Etapa 2: Backend y Servidor Web ---
-FROM php:8.2-apache
+# --- Etapa 2: Backend ---
+FROM php:8.2-fpm
 
+# Instalar nginx y dependencias
 RUN apt-get update && apt-get install -y \
+    nginx \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
@@ -19,37 +21,55 @@ RUN apt-get update && apt-get install -y \
     curl \
     libzip-dev \
     libicu-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
-
-RUN a2enmod rewrite
-
-# Fix: desactivar MPMs conflictivos
-RUN a2dismod mpm_prefork mpm_worker || true && \
-    a2enmod mpm_event
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 
-COPY backend/ ./
+# Copiar backend y frontend
+COPY backend/ .
 COPY --from=frontend-build /app/frontend/dist/ ./public/
 
+# Instalar composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-RUN sed -i 's/80/${PORT:-80}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
-
-# Fix: www-data ya existe en php:8.2-apache, pero por si acaso
-RUN id www-data || useradd -r -s /bin/false www-data
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+# Permisos
+RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Configurar Nginx
+RUN echo 'server { \n\
+    listen ${PORT:-80}; \n\
+    root /var/www/html/public; \n\
+    index index.php; \n\
+    location / { \n\
+        try_files $uri $uri/ /index.php?$query_string; \n\
+    } \n\
+    location ~ \.php$ { \n\
+        fastcgi_pass 127.0.0.1:9000; \n\
+        fastcgi_index index.php; \n\
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
+        include fastcgi_params; \n\
+    } \n\
+}' > /etc/nginx/sites-available/default
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-RUN printf '#!/bin/bash\nset -e\ncd /var/www/html\nphp artisan migrate --force\nphp artisan config:cache\nphp artisan route:cache\napache2-foreground' > /start.sh && chmod +x /start.sh
+# Script de inicio
+RUN printf '#!/bin/bash\nset -e\n\
+# Reemplazar puerto dinamico en nginx\n\
+sed -i "s/\${PORT:-80}/${PORT:-80}/g" /etc/nginx/sites-available/default\n\
+# Laravel\n\
+cd /var/www/html\n\
+php artisan migrate --force\n\
+php artisan config:cache\n\
+php artisan route:cache\n\
+# Iniciar php-fpm y nginx\n\
+php-fpm -D\n\
+nginx -g "daemon off;"\n\
+' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80
 
