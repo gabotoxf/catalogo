@@ -33,7 +33,6 @@ WORKDIR /var/www/html
 COPY backend/ ./
 
 # Copiar el build del frontend a la carpeta pública de Laravel
-# Nota: Vite construye en 'dist'. Copiamos su contenido a 'public'
 COPY --from=frontend-build /app/frontend/dist/ ./public/
 
 # Instalación de Composer y dependencias de PHP
@@ -45,9 +44,8 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Configurar Apache para escuchar en el puerto dinámico de Render ($PORT)
-# Si $PORT no está definido, por defecto usará 80 (útil para local)
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
+# Configurar Apache para escuchar en el puerto dinámico ($PORT), por defecto 80
+RUN sed -i 's/80/${PORT:-80}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 # Ajustar permisos para carpetas de almacenamiento y caché de Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
@@ -57,8 +55,11 @@ RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Exponer puerto (informativo para Render)
+# Crear script de inicio que corre migraciones y luego inicia Apache
+RUN printf '#!/bin/bash\nset -e\ncd /var/www/html\nphp artisan migrate --force\nphp artisan config:cache\nphp artisan route:cache\napache2-foreground' > /start.sh && chmod +x /start.sh
+
+# Exponer puerto
 EXPOSE 80
 
-# Iniciar Apache en primer plano
-CMD ["apache2-foreground"]
+# Usar script de inicio
+CMD ["/start.sh"]
