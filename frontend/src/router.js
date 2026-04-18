@@ -14,32 +14,38 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: Home
+    component: Home,
+    meta: { title: 'Inicio' }
   },
   {
     path: '/productos',
     name: 'products',
-    component: Products
+    component: Products,
+    meta: { title: 'Productos' }
   },
   {
     path: '/producto/:id',
     name: 'product-detail',
-    component: ProductDetail
+    component: ProductDetail,
+    meta: { title: 'Detalle del Producto' }
   },
   {
     path: '/login',
     name: 'login',
-    component: Login
+    component: Login,
+    meta: { title: 'Iniciar Sesión' }
   },
   {
     path: '/checkout',
     name: 'checkout',
-    component: Checkout
+    component: Checkout,
+    meta: { title: 'Finalizar Pedido' }
   },
   {
     path: '/categoria/:id',
     name: 'category-products',
-    component: Products
+    component: Products,
+    meta: { title: 'Categoría' }
   },
   {
     path: '/dashboard',
@@ -48,22 +54,26 @@ const routes = [
       {
         path: '',
         name: 'dashboard-home',
-        component: DashboardHome
+        component: DashboardHome,
+        meta: { title: 'Dashboard - Inicio' }
       },
       {
         path: 'productos',
         name: 'dashboard-products',
-        component: DashboardProducts
+        component: DashboardProducts,
+        meta: { title: 'Dashboard - Productos' }
       },
       {
         path: 'categorias',
         name: 'dashboard-categories',
-        component: DashboardCategories
+        component: DashboardCategories,
+        meta: { title: 'Dashboard - Categorías' }
       },
       {
         path: 'usuarios',
         name: 'dashboard-usuarios',
-        component: DashboardUsers
+        component: DashboardUsers,
+        meta: { title: 'Dashboard - Usuarios' }
       }
     ]
   },
@@ -76,6 +86,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const baseTitle = 'Chaparro Ecommerce'
+  const pageTitle = to.meta.title ? `${to.meta.title} | ${baseTitle}` : baseTitle
+  document.title = pageTitle
+  next()
 })
 
 export default router

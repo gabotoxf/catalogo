@@ -18,6 +18,15 @@ const sortOption = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
 
+const fetchCategories = async () => {
+  try {
+    const res = await api.get('/categorias')
+    categories.value = res.data || []
+  } catch (err) {
+    console.error('Error fetching categories', err)
+  }
+}
+
 const fetchData = async (page = 1) => {
   loading.value = true
   currentPage.value = page
@@ -31,14 +40,10 @@ const fetchData = async (page = 1) => {
       page: page
     }
     
-    const [prodRes, homeRes] = await Promise.all([
-      api.post('/productos/filtrar', params),
-      api.get('/home')
-    ])
+    const prodRes = await api.post('/productos/filtrar', params)
     
     products.value = prodRes.data.productos || []
     totalPages.value = prodRes.data.totalPaginas || 1
-    categories.value = homeRes.data.categorias || []
   } catch (err) {
     console.error('Error fetching data', err)
   } finally {
@@ -69,7 +74,10 @@ const resetFilters = () => {
   fetchData()
 }
 
-onMounted(fetchData)
+onMounted(() => {
+  fetchCategories()
+  fetchData()
+})
 
 watch(() => route.params.id, (newId) => {
   selectedCategory.value = newId || ''
@@ -109,29 +117,26 @@ watch(() => route.query.search, (newQuery) => {
 
             <!-- CONTENEDOR CON SCROLL -->
             <div class="max-h-44 overflow-y-auto pr-1 space-y-1 custom-scroll">
-              <div v-if="loading && categories.length === 0" class="space-y-1">
-                <Skeleton v-for="i in 5" :key="i" height="32px" borderRadius="8px" />
-              </div>
-              <template v-else>
-                <button @click="resetFilters" :class="[
+
+              <button @click="resetFilters" :class="[
+                'w-full text-left px-3 py-2 rounded-lg text-sm transition-all',
+                !selectedCategory
+                  ? 'bg-brand-900 text-white'
+                  : 'text-neutral-600 hover:bg-neutral-100'
+              ]">
+                Todas
+              </button>
+
+              <button v-for="cat in categories" :key="cat.id_categoria" @click="filterByCategory(cat.id_categoria)"
+                :class="[
                   'w-full text-left px-3 py-2 rounded-lg text-sm transition-all',
-                  !selectedCategory
+                  selectedCategory == cat.id_categoria
                     ? 'bg-brand-900 text-white'
                     : 'text-neutral-600 hover:bg-neutral-100'
                 ]">
-                  Todas
-                </button>
+                {{ cat.nombre_categoria }}
+              </button>
 
-                <button v-for="cat in categories" :key="cat.id_categoria" @click="filterByCategory(cat.id_categoria)"
-                  :class="[
-                    'w-full text-left px-3 py-2 rounded-lg text-sm transition-all',
-                    selectedCategory == cat.id_categoria
-                      ? 'bg-brand-900 text-white'
-                      : 'text-neutral-600 hover:bg-neutral-100'
-                  ]">
-                  {{ cat.nombre_categoria }}
-                </button>
-              </template>
             </div>
           </div>
 
@@ -185,11 +190,7 @@ watch(() => route.query.search, (newQuery) => {
       <main class="flex-1 space-y-8">
         <div
           class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-brand-100 shadow-sm">
-          <div v-if="loading && !searchQuery" class="space-y-2 w-full max-w-xs">
-            <Skeleton width="180px" height="24px" />
-            <Skeleton width="120px" height="14px" />
-          </div>
-          <div v-else>
+          <div>
             <h1 class="text-2xl font-black text-brand-900 uppercase tracking-tight">
               {{ searchQuery ? `Resultados para "${searchQuery}"` : 'Nuestros Productos' }}
             </h1>

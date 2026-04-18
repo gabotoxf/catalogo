@@ -2,14 +2,13 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
-import { 
-  LayoutDashboard, 
-  Package, 
-  Layers, 
-  Users, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  LayoutDashboard,
+  Package,
+  Layers,
+  Users,
+  LogOut,
+  Menu,
   X,
   Bell,
   Search,
@@ -21,7 +20,10 @@ import Skeleton from './Skeleton.vue'
 const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
-const isSidebarOpen = ref(true)
+
+// En desktop el sidebar siempre está "abierto" visualmente (posición estática),
+// este ref solo controla el drawer móvil.
+const isMobileDrawerOpen = ref(false)
 const dashboardSearchQuery = ref('')
 const isLoadingInitial = ref(true)
 
@@ -43,65 +45,91 @@ const handleLogout = async () => {
   router.push('/login')
 }
 
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value
+const toggleMobileDrawer = () => {
+  isMobileDrawerOpen.value = !isMobileDrawerOpen.value
 }
 
-onMounted(async () => {
-  if (!authStore.isAuthenticated || !authStore.isAdmin) {
+const closeMobileDrawer = () => {
+  isMobileDrawerOpen.value = false
+}
+
+const isActiveRoute = (item) =>
+  route.path === item.path ||
+  (item.path !== '/dashboard' && route.path.startsWith(item.path))
+
+onMounted(() => {
+  if (!authStore.isAuthenticated || authStore.user?.rol_usuario != 1) {
     router.push('/login')
     return
   }
-
-  // Simulate initial load for smooth skeleton transition
-  setTimeout(() => {
-    isLoadingInitial.value = false
-  }, 600)
+  setTimeout(() => { isLoadingInitial.value = false }, 600)
 })
 </script>
 
 <template>
-  <div class="layout-root">
-    <!-- Sidebar -->
-    <aside class="sidebar" :class="{ 'sidebar--open': isSidebarOpen }">
-      <div class="sidebar__inner">
+  <!-- Root: flex row, full viewport height -->
+  <div class="flex h-screen overflow-hidden bg-neutral-100 font-sans">
+
+    <!-- ═══════════════════════════════════════════
+         SIDEBAR — desktop: always visible (static)
+                   mobile:  drawer (fixed, z-50)
+         ═══════════════════════════════════════════ -->
+    <aside class="
+        flex-shrink-0 w-68 h-screen bg-white border-r border-neutral-200
+        flex flex-col
+        transition-transform duration-300 ease-[cubic-bezier(.4,0,.2,1)]
+
+        /* Desktop: posición normal en el flujo, siempre visible */
+        lg:relative lg:translate-x-0
+
+        /* Mobile: fixed drawer, oculto por defecto */
+        max-lg:fixed max-lg:top-0 max-lg:left-0 max-lg:z-50
+      " :class="isMobileDrawerOpen ? 'max-lg:translate-x-0' : 'max-lg:-translate-x-full'">
+      <div class="flex flex-col h-full px-4 py-6">
+
         <!-- Logo -->
-        <div class="sidebar__logo">
-          <div class="sidebar__logo-icon">
+        <div class="flex items-center gap-3 px-2 pb-8">
+          <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center text-white flex-shrink-0">
             <Store :size="20" />
           </div>
-          <span class="sidebar__logo-text">Chaparro Admin</span>
+          <span class="text-[1.1rem] font-extrabold text-brand-900 tracking-tight">
+            Chaparro Admin
+          </span>
         </div>
 
         <!-- Navigation -->
-        <nav class="sidebar__nav">
-          <RouterLink
-            v-for="item in menuItems"
-            :key="item.path"
-            :to="item.path"
-            class="sidebar__nav-item"
-            active-class="sidebar__nav-item--active"
-            :exact-active-class="'sidebar__nav-item--active'"
-          >
+        <nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
+          <RouterLink v-for="item in menuItems" :key="item.path" :to="item.path" @click="closeMobileDrawer" class="
+              flex items-center gap-3 px-3.5 py-2.5 rounded-xl
+              text-sm font-semibold text-slate-500
+              transition-all duration-200
+              hover:bg-brand-50 hover:text-brand-900
+            " :class="isActiveRoute(item) ? 'bg-brand-900 !text-white shadow-lg shadow-brand-900/20' : ''">
             <component :is="item.icon" :size="18" />
             <span>{{ item.name }}</span>
-            <ChevronRight v-if="route.path === item.path || (item.path !== '/dashboard' && route.path.startsWith(item.path))" :size="14" class="sidebar__nav-chevron" />
+            <ChevronRight v-if="isActiveRoute(item)" :size="14" class="ml-auto opacity-50" />
           </RouterLink>
         </nav>
 
-        <!-- Footer: User + Logout -->
-        <div class="sidebar__footer">
-          <div class="sidebar__user">
-            <div class="sidebar__avatar">
+        <!-- Footer: user info + logout -->
+        <div class="mt-auto pt-5 border-t border-brand-100 flex flex-col gap-3">
+          <div class="flex items-center gap-2.5 px-2">
+            <div
+              class="w-8 h-8 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center text-xs font-bold text-brand-900 flex-shrink-0">
               {{ authStore.user?.nombre?.charAt(0)?.toUpperCase() || 'A' }}
             </div>
-            <div class="sidebar__user-info">
-              <p class="sidebar__user-name">{{ authStore.user?.nombre || 'Admin' }}</p>
-              <p class="sidebar__user-role">Administrador</p>
+            <div class="min-w-0">
+              <p class="text-[0.8125rem] font-bold text-brand-900 truncate max-w-[140px]">
+                {{ authStore.user?.nombre || 'Admin' }}
+              </p>
+              <p class="text-[0.6875rem] text-brand-500 font-medium uppercase tracking-wide">
+                Administrador
+              </p>
             </div>
           </div>
 
-          <button class="sidebar__logout" @click="handleLogout">
+          <button @click="handleLogout"
+            class="flex items-center gap-2.5 w-full px-3.5 py-2.5 rounded-xl text-[0.8125rem] font-semibold text-red-500 hover:bg-red-50 transition-all duration-200 cursor-pointer">
             <LogOut :size="18" />
             <span>Cerrar sesión</span>
           </button>
@@ -110,49 +138,57 @@ onMounted(async () => {
     </aside>
 
     <!-- Mobile overlay -->
-    <div
-      v-if="isSidebarOpen"
-      class="layout-overlay"
-      @click="isSidebarOpen = false"
-    />
+    <Transition name="fade">
+      <div v-if="isMobileDrawerOpen" class="fixed inset-0 bg-black/45 z-40 lg:hidden" @click="closeMobileDrawer" />
+    </Transition>
 
-    <!-- Right column: navbar + content -->
-    <div class="layout-main">
-      <!-- Navbar fijo -->
-      <header class="navbar">
-        <div class="navbar__left">
-          <button class="navbar__menu-btn" @click="isSidebarOpen = !isSidebarOpen">
-            <Menu v-if="!isSidebarOpen" :size="20" />
-            <X v-else :size="20" />
-          </button>
+    <!-- ═══════════════════════════════════════════
+         MAIN COLUMN: navbar + content
+         ═══════════════════════════════════════════ -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-slate-50">
 
-          <div class="navbar__search">
-            <Search :size="14" class="text-neutral-400" />
-            <input 
-              v-model="dashboardSearchQuery"
-              @keyup.enter="handleDashboardSearch"
-              type="text" 
-              placeholder="Buscar productos..." 
-              class="text-xs font-medium"
-            />
+      <!-- Sticky navbar -->
+      <header class="sticky top-0 z-40 bg-white border-b border-neutral-200 shadow-sm">
+        <div class="flex items-center justify-between px-4 sm:px-8 py-4 gap-4">
+
+          <!-- Left: toggle (mobile only) + search -->
+          <div class="flex items-center gap-3">
+            <!-- Toggle: en desktop se puede ocultar o mantener para preferencia del usuario -->
+            <button @click="toggleMobileDrawer"
+              class="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900 transition-all cursor-pointer flex-shrink-0">
+              <Menu v-if="!isMobileDrawerOpen" :size="20" />
+              <X v-else :size="20" />
+            </button>
+
+            <!-- Search bar -->
+            <div
+              class="hidden sm:flex items-center gap-3 bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-2.5 w-72 focus-within:border-brand-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-brand-100 transition-all">
+              <Search :size="14" class="text-neutral-400 flex-shrink-0" />
+              <input v-model="dashboardSearchQuery" @keyup.enter="handleDashboardSearch" type="text"
+                placeholder="Buscar productos..."
+                class="bg-transparent border-none outline-none w-full text-sm text-neutral-900 placeholder:text-neutral-400 placeholder:font-normal font-medium" />
+            </div>
           </div>
-        </div>
 
-        <div class="navbar__right">
-          <button class="navbar__icon-btn">
-            <Bell :size="18" />
-            <span class="navbar__badge"></span>
-          </button>
+          <!-- Right: bell + store link -->
+          <div class="flex items-center gap-2">
+            <button
+              class="relative flex items-center justify-center w-10 h-10 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 transition-all cursor-pointer">
+              <Bell :size="18" />
+              <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white" />
+            </button>
 
-          <RouterLink to="/" class="navbar__store-btn">
-            <Store :size="16" />
-            <span>Ver tienda</span>
-          </RouterLink>
+            <RouterLink to="/"
+              class="flex items-center gap-2 px-4 py-2.5 bg-brand-900 text-white rounded-xl text-sm font-bold hover:bg-brand-800 transition-all hover:-translate-y-px">
+              <Store :size="16" />
+              <span class="hidden sm:inline">Ver tienda</span>
+            </RouterLink>
+          </div>
         </div>
       </header>
 
       <!-- Content area -->
-      <main class="layout-content">
+      <main class="flex-1 p-6 sm:p-10 max-w-[1600px] w-full mx-auto">
         <div v-if="isLoadingInitial" class="space-y-8 animate-in fade-in duration-500">
           <div class="flex flex-col gap-2">
             <Skeleton width="200px" height="28px" />
@@ -170,6 +206,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+
         <router-view v-else v-slot="{ Component }">
           <transition name="page" mode="out-in">
             <component :is="Component" />
@@ -181,304 +218,12 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-/* ─── Reset & root ────────────────────────────────────────────── */
-.layout-root {
-  display: flex;
-  height: 100vh;        /* ocupa exactamente la ventana */
-  overflow: hidden;     /* impide que el body scrollee */
-  background: #f5f5f4;
-  font-family: 'Inter', sans-serif;
-}
-
-/* ─── Sidebar ─────────────────────────────────────────────────── */
-.sidebar {
+/* Sidebar width personalizada (no está en Tailwind por defecto) */
+.w-68 {
   width: 272px;
-  min-width: 272px;
-  height: 100%;         /* 100% del padre que ya es 100vh */
-  background: #ffffff;
-  border-right: 1px solid #e5e7eb;
-  z-index: 50;
-
-  /* escritorio: siempre visible */
-  position: sticky;
-  top: 0;
-  left: 0;
 }
 
-.sidebar__inner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 24px 16px;
-}
-
-/* Logo */
-.sidebar__logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 8px 32px;
-}
-
-.sidebar__logo-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--color-brand-900);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.sidebar__logo-text {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: var(--color-brand-900);
-  letter-spacing: -0.025em;
-}
-
-/* Nav */
-.sidebar__nav {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow-y: auto;     /* si hay muchos items, solo el nav scrollea */
-}
-
-.sidebar__nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.sidebar__nav-item:hover {
-  background: var(--color-brand-50);
-  color: var(--color-brand-900);
-}
-
-.sidebar__nav-item--active {
-  background: var(--color-brand-900);
-  color: #ffffff;
-}
-
-.sidebar__nav-chevron {
-  margin-left: auto;
-  opacity: 0.5;
-}
-
-/* Footer */
-.sidebar__footer {
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-brand-100);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sidebar__user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px;
-}
-
-.sidebar__avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--color-brand-50);
-  border: 1px solid var(--color-brand-100);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-brand-900);
-  flex-shrink: 0;
-}
-
-.sidebar__user-name {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  color: var(--color-brand-900);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-}
-
-.sidebar__user-role {
-  font-size: 0.6875rem;
-  color: var(--color-brand-500);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.sidebar__logout {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #ef4444;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.sidebar__logout:hover {
-  background: #fef2f2;
-}
-
-/* ─── Layout main (columna derecha) ───────────────────────────── */
-.layout-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;     /* evita que esta columna scrollee */
-  min-width: 0;
-}
-
-/* ─── Navbar ──────────────────────────────────────────────────── */
-.navbar {
-  height: 56px;
-  background: #ffffff;
-  border-bottom: 1px solid #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 40;
-}
-
-.navbar__left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.navbar__menu-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  color: #6b7280;
-  transition: all 0.2s;
-}
-
-.navbar__search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f9fafb;
-  border: 1px solid #f3f4f6;
-  padding: 6px 14px;
-  border-radius: 10px;
-  width: 280px;
-  transition: all 0.2s;
-}
-
-.navbar__search:focus-within {
-  background: #ffffff;
-  border-color: var(--color-brand-900);
-  box-shadow: 0 0 0 2px var(--color-brand-100);
-}
-
-.navbar__search input {
-  background: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-  font-size: 0.8125rem;
-  color: var(--color-brand-900);
-  font-weight: 500;
-}
-
-/* ─── Right side ──────────────────────────────────────────────── */
-.navbar__right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.navbar__icon-btn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  color: var(--color-brand-500);
-  position: relative;
-  transition: all 0.2s;
-}
-
-.navbar__icon-btn:hover {
-  background: var(--color-brand-50);
-  color: var(--color-brand-900);
-}
-
-.navbar__badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 6px;
-  height: 6px;
-  background: #ef4444;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-}
-
-.navbar__store-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: var(--color-brand-900);
-  color: #ffffff;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  transition: all 0.2s;
-}
-
-.navbar__store-btn:hover {
-  background: var(--color-brand-800);
-  transform: translateY(-1px);
-}
-
-/* ─── Content ─────────────────────────────────────────────────── */
-.layout-content {
-  flex: 1;
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-/* ─── Transición de páginas ───────────────────────────────────── */
+/* Transición de página */
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -504,66 +249,14 @@ onMounted(async () => {
   transform: translateY(-8px);
 }
 
-/* ─── Mobile overlay ──────────────────────────────────────────── */
-.layout-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 45;
-  display: none;
+/* Fade para el overlay */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.25s ease;
 }
 
-/* ─── Responsive ──────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  /* En móvil el sidebar sale del flujo */
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar--open {
-    transform: translateX(0);
-  }
-
-  .layout-overlay {
-    display: block;
-  }
-
-  .navbar__menu-btn {
-    display: flex;
-  }
-
-  .navbar__search {
-    width: 200px;
-  }
-
-  .layout-content {
-    padding: 20px 16px;
-  }
-}
-
-@media (max-width: 640px) {
-  .navbar__search {
-    display: none;
-  }
-
-  .navbar__store-btn span {
-    display: none;
-  }
-
-  .navbar {
-    padding: 0 16px;
-  }
-}
-</style>
-
-<style scoped>
-@reference "../../style.css";
-.router-link-active {
-  @apply bg-brand-900 text-white shadow-xl shadow-brand-900/20;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

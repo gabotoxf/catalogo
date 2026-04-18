@@ -6,7 +6,6 @@ import { useAuthStore } from '../../stores/auth'
 import { ShoppingCart, User, Search, Menu, X, ChevronDown, MapPin, Truck, Tag, Users, Info, Loader2, ArrowRight } from 'lucide-vue-next'
 import CartModal from './CartModal.vue'
 import api from '../../api/axios'
-import { getProductImageUrl } from '../../utils/helpers'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
@@ -81,7 +80,11 @@ const fetchCategories = async () => {
   }
 }
 
-const getImageUrl = getProductImageUrl
+const getImageUrl = (img) => {
+  if (!img) return null
+  if (img.startsWith('http')) return img
+  return `http://localhost:8000/assets/img/Productos/${img}`
+}
 
 onMounted(() => {
   fetchCategories()
@@ -248,8 +251,19 @@ onMounted(() => {
     </header>
 
     <!-- Mobile Menu -->
-    <div v-if="isMenuOpen" class="md:hidden fixed inset-0 z-[60] bg-white overflow-y-auto pt-20">
+    <div v-if="isMenuOpen" class="md:hidden fixed inset-0 z-[120] bg-white overflow-y-auto pt-6 animate-in slide-in-from-right duration-300">
       <div class="p-6 space-y-8">
+        <!-- Close Button & Logo -->
+        <div class="flex items-center justify-between mb-8">
+          <RouterLink to="/" class="flex items-center gap-2" @click="isMenuOpen = false">
+            <img src="/logo.jfif" alt="Logo" class="h-10 w-10 object-cover rounded shadow-sm" />
+            <span class="text-xl font-black tracking-tighter text-brand-900 uppercase">Chaparro</span>
+          </RouterLink>
+          <button @click="isMenuOpen = false" class="p-2 bg-brand-50 text-brand-900 rounded-full hover:bg-brand-100 transition-colors">
+            <X :size="24" />
+          </button>
+        </div>
+
         <div class="relative">
           <input v-model="searchQuery" @keyup.enter="handleSearch" type="text" placeholder="¿Qué buscas hoy?"
             class="w-full pl-12 pr-4 py-4 bg-brand-50 rounded-xl text-base font-medium border-none focus:ring-2 focus:ring-brand-500" />

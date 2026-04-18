@@ -1,5 +1,6 @@
 <script setup>
 import { ShoppingBasket, ArrowRight, Tag } from 'lucide-vue-next'
+import { getAssetUrl } from '../../utils/helpers'
 
 const promos = [
   {
@@ -10,7 +11,7 @@ const promos = [
     items: ['3kg Papas', '1kg Cebolla', '2kg Tomate', '1 Cubeta Huevos'],
     color: 'bg-brand-50',
     textColor: 'text-brand-900',
-    image: '/src/assets/img/Banners/Verduras.jpg'
+    image: 'img/Banners/Verduras.jpg'
   },
   {
     title: 'Combo Frutero',
@@ -20,7 +21,7 @@ const promos = [
     items: ['1kg Banano', '1kg Manzana', '1kg Papaya', '500g Fresas'],
     color: 'bg-accent-50',
     textColor: 'text-accent-900',
-    image: '/src/assets/img/Banners/Papas2.jpg'
+    image: 'img/Banners/Papas2.jpg'
   }
 ]
 </script>
@@ -41,7 +42,7 @@ const promos = [
           class="relative overflow-hidden rounded-[3rem] p-8 md:p-12 group"
         >
           <img 
-            :src="promo.image" 
+            :src="getAssetUrl(promo.image)" 
             class="absolute top-0 right-0 w-1/2 h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none" 
             alt="Promo Decor"
           />

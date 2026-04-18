@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   getters: {
     isAuthenticated: (state) => !!state.token,
-    isAdmin: (state) => (state.user?.rol === 1 || state.user?.rol === '1') || (state.user?.rol_usuario === 1 || state.user?.rol_usuario === '1')
+    isAdmin: (state) => state.user?.rol_usuario === 1 || state.user?.rol_usuario === '1'
   },
   actions: {
     async login(credentials) {

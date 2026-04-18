@@ -8,20 +8,27 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        return response()->json([
-            'stats' => [
+        $stats = Cache::remember('dashboard_stats', 300, function () {
+            return [
                 'totalProductos' => Producto::count(),
                 'totalCategorias' => Categoria::count(),
                 'stockBajo' => Producto::where('cantidad_producto', '<', 10)->count(),
                 'valorInventario' => Producto::sum(DB::raw('precio_producto * IFNULL(cantidad_producto, 0)')),
-            ],
-            'ultimosProductos' => Producto::with('categoria')->orderBy('id_producto', 'desc')->take(5)->get(),
-            'categoriasPopulares' => Categoria::withCount('productos')->orderBy('productos_count', 'desc')->take(5)->get()
+            ];
+        });
+
+        return response()->json([
+            'stats' => $stats,
+            'ultimosProductos' => Producto::with('categoria:id_categoria,nombre_categoria')->orderBy('id_producto', 'desc')->take(5)->get(),
+            'categoriasPopulares' => Cache::remember('popular_categories', 3600, function () {
+                return Categoria::withCount('productos')->orderBy('productos_count', 'desc')->take(5)->get();
+            })
         ]);
     }
 
@@ -56,6 +63,9 @@ class DashboardController extends Controller
         }
 
         $categoria = Categoria::create($data);
+        Cache::forget('all_categories');
+        Cache::forget('popular_categories');
+        Cache::forget('dashboard_stats');
         return response()->json($categoria, 201);
     }
 
@@ -86,6 +96,9 @@ class DashboardController extends Controller
         }
 
         $categoria->update($data);
+        Cache::forget('all_categories');
+        Cache::forget('popular_categories');
+        Cache::forget('dashboard_stats');
         return response()->json($categoria);
     }
 
@@ -100,6 +113,9 @@ class DashboardController extends Controller
         }
 
         $categoria->delete();
+        Cache::forget('all_categories');
+        Cache::forget('popular_categories');
+        Cache::forget('dashboard_stats');
         return response()->json(['message' => 'Eliminado']);
     }
 
@@ -141,6 +157,8 @@ class DashboardController extends Controller
         }
 
         $producto = Producto::create($data);
+        Cache::forget('dashboard_stats');
+        Cache::forget('popular_categories');
         return response()->json($producto, 201);
     }
 
@@ -175,6 +193,8 @@ class DashboardController extends Controller
         }
 
         $producto->update($data);
+        Cache::forget('dashboard_stats');
+        Cache::forget('popular_categories');
         return response()->json($producto);
     }
 
@@ -184,6 +204,8 @@ class DashboardController extends Controller
         if (!$producto) return response()->json(['error' => 'No encontrado'], 404);
         
         $producto->delete();
+        Cache::forget('dashboard_stats');
+        Cache::forget('popular_categories');
         return response()->json(['message' => 'Eliminado']);
     }
 

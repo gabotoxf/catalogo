@@ -1,5 +1,6 @@
 <script setup>
 import { MapPin, Quote } from 'lucide-vue-next'
+import { getAssetUrl } from '../../utils/helpers'
 
 const producers = [
   {
@@ -8,7 +9,7 @@ const producers = [
     location: 'Vereda El Hato',
     specialty: 'Papas y Tubérculos',
     story: 'Más de 30 años cultivando la tierra con métodos tradicionales y orgánicos.',
-    image: '/src/assets/img/Banners/Papas2.jpg'
+    image: 'img/Banners/Papas2.jpg'
   },
   {
     id: 2,
@@ -16,7 +17,7 @@ const producers = [
     location: 'Finca La Esperanza',
     specialty: 'Verduras de Hoja',
     story: 'Líder de la asociación local de mujeres productoras de hortalizas frescas.',
-    image: '/src/assets/img/Banners/Verduras.jpg'
+    image: 'img/Banners/Verduras.jpg'
   }
 ]
 </script>
@@ -44,7 +45,7 @@ const producers = [
           
           <div class="flex flex-col sm:flex-row gap-8 items-center sm:items-start relative z-10">
             <div class="w-32 h-32 shrink-0 rounded-2xl overflow-hidden border-4 border-brand-500/20">
-              <img :src="producer.image" :alt="producer.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+              <img :src="getAssetUrl(producer.image)" :alt="producer.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
             </div>
             
             <div class="text-center sm:text-left">

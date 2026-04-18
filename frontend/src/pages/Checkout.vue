@@ -30,6 +30,7 @@ const userData = ref({
 const isSubmitting = ref(false)
 
 onMounted(() => {
+  window.scrollTo(0, 0)
   if (cartStore.cartItems.length === 0) {
     router.push('/productos')
   }
@@ -43,14 +44,18 @@ const handleCheckout = () => {
   
   isSubmitting.value = true
   cartStore.checkoutWhatsApp(userData.value)
-  // Optionally clear cart or wait for user to return
+  
+  // Wait for the notification and redirection to WhatsApp to start
+  setTimeout(() => {
+    router.push('/')
+  }, 2000)
 }
 
-import { getProductImageUrl } from '../utils/helpers'
-
-// ... existing code
-
-const getImageUrl = getProductImageUrl
+const getImageUrl = (img) => {
+  if (!img) return null
+  if (img.startsWith('http')) return img
+  return `http://localhost:8000/assets/img/Productos/${img}`
+}
 </script>
 
 <template>

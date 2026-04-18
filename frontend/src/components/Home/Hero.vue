@@ -5,6 +5,7 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-fade'
 import { ArrowRight, Play } from 'lucide-vue-next'
+import { getAssetUrl } from '../../utils/helpers'
 </script>
 
 <template>
@@ -25,7 +26,7 @@ import { ArrowRight, Play } from 'lucide-vue-next'
         <!-- SLIDE 1: General Value Proposition -->
         <SwiperSlide>
             <div class="relative w-full h-full">
-                <img src="/src/assets/img/Banners/Verduras.jpg" alt="Campo Real" class="absolute inset-0 w-full h-full object-cover" />
+                <img :src="getAssetUrl('img/Banners/Verduras.jpg')" alt="Campo Real" class="absolute inset-0 w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40"></div>
                 <div class="relative h-full max-w-[var(--max-width)] mx-auto px-4 md:px-6 flex flex-col justify-center items-start text-white">
                     <span class="inline-block px-4 py-1 bg-brand-500 text-white text-xs font-bold rounded-full mb-4 animate-fade-in uppercase tracking-widest">Directo del campo</span>
@@ -51,7 +52,7 @@ import { ArrowRight, Play } from 'lucide-vue-next'
         <!-- SLIDE 2: Authenticity / Farmers -->
         <SwiperSlide>
             <div class="relative w-full h-full">
-                <img src="/src/assets/img/Banners/Papas2.jpg" alt="Productores Locales" class="absolute inset-0 w-full h-full object-cover" />
+                <img :src="getAssetUrl('img/Banners/Papas2.jpg')" alt="Productores Locales" class="absolute inset-0 w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40"></div>
                 <div class="relative h-full max-w-[var(--max-width)] mx-auto px-4 md:px-6 flex flex-col justify-center items-center text-center text-white">
                     <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight max-w-4xl">
@@ -62,7 +63,7 @@ import { ArrowRight, Play } from 'lucide-vue-next'
                     </p>
                     <div class="flex flex-wrap justify-center gap-4">
                         <RouterLink to="/productores" class="px-10 py-4 bg-white text-brand-900 rounded-full font-bold transition-all shadow-xl hover:scale-105">
-                            Conocer productores
+                            Con conocer productores
                         </RouterLink>
                         <button class="px-8 py-4 bg-brand-500/20 hover:bg-brand-500/40 border border-brand-500/50 rounded-full font-bold transition-all flex items-center gap-2">
                             <Play :size="18" fill="currentColor" />
@@ -87,7 +88,7 @@ import { ArrowRight, Play } from 'lucide-vue-next'
 
 :deep(.swiper-pagination-bullet-active) {
     opacity: 1;
-    background: var(--color-brand-600);
+    background: #628f2c; /* brand-500 equivalent */
     width: 30px;
     border-radius: 6px;
 }

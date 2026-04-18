@@ -5,14 +5,30 @@ namespace App\Http\Controllers;
 use App\Models\Producto;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PrincipalController extends Controller
 {
+    public function categorias()
+    {
+        $categorias = Cache::remember('all_categories', 3600, function () {
+            return Categoria::all();
+        });
+        return response()->json($categorias);
+    }
+
     public function productos()
     {
         $productosPorPagina = 10;
-        $productos = Producto::with('categoria')->orderBy('id_producto', 'desc')->paginate($productosPorPagina);
-        $todasCategorias = Categoria::all();
+        // Optimization: Use select to only get needed columns if possible, but for now just with()
+        $productos = Producto::with('categoria:id_categoria,nombre_categoria')
+            ->orderBy('id_producto', 'desc')
+            ->paginate($productosPorPagina);
+        
+        $todasCategorias = Cache::remember('all_categories', 3600, function () {
+            return Categoria::all();
+        });
 
         return response()->json([
             'title' => 'Productos',

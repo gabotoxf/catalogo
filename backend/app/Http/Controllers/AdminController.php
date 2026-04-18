@@ -29,7 +29,7 @@ class AdminController extends Controller
                 'user' => [
                     'id' => $usuario->id_usuario,
                     'nombre' => $usuario->nombre_usuario,
-                    'rol' => $usuario->rol_usuario,
+                    'rol_usuario' => $usuario->rol_usuario,
                 ]
             ]);
         }

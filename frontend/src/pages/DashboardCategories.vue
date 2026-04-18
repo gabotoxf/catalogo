@@ -2,7 +2,8 @@
 import { ref, onMounted, watch } from 'vue'
 import api from '../api/axios'
 import Skeleton from '../components/layout/Skeleton.vue'
-import { getCategoryImageUrl } from '../utils/helpers'
+import Toastify from 'toastify-js'
+import 'toastify-js/src/toastify.css'
 import { 
   Plus, 
   Trash2, 
@@ -13,7 +14,8 @@ import {
   Layers,
   ChevronLeft,
   ChevronRight,
-  Image as ImageIcon
+  ImageIcon,
+  AlertTriangle
 } from 'lucide-vue-next'
 
 const categories = ref([])
@@ -25,10 +27,50 @@ const pagination = ref({
 })
 const loading = ref(true)
 const showModal = ref(false)
+const showDeleteModal = ref(false)
+const itemToDelete = ref(null)
 const isEditing = ref(false)
 const currentItem = ref(null)
 const searchQuery = ref('')
 const fileInput = ref(null)
+
+const showToast = (message, type = 'success') => {
+  const toastNode = document.createElement("div");
+  const isSuccess = type === 'success';
+  
+  toastNode.innerHTML = `
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <div class="absolute inset-0 ${isSuccess ? 'bg-emerald-400' : 'bg-red-400'} blur-md opacity-30 rounded-full"></div>
+        <div class="relative bg-gradient-to-br ${isSuccess ? 'from-emerald-400 to-emerald-600' : 'from-red-400 to-red-600'} p-2.5 rounded-xl shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            ${isSuccess ? '<polyline points="20 6 9 17 4 12"></polyline>' : '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>'}
+          </svg>
+        </div>
+      </div>
+      <div class="flex flex-col leading-tight">
+        <span class="text-[10px] uppercase tracking-[0.25em] ${isSuccess ? 'text-emerald-300' : 'text-red-300'} font-semibold">
+          ${isSuccess ? 'Operación Exitosa' : 'Error'}
+        </span>
+        <span class="text-sm font-semibold text-white">
+          ${message}
+        </span>
+      </div>
+    </div>
+  `;
+
+  Toastify({
+    node: toastNode,
+    duration: 3000,
+    gravity: "bottom",
+    position: "right",
+    style: {
+      background: isSuccess ? "linear-gradient(to right, #1a2e05, #628f2c)" : "linear-gradient(to right, #450a0a, #991b1b)",
+      borderRadius: "20px",
+      padding: "16px 24px",
+    }
+  }).showToast();
+}
 
 const form = ref({
   nombre_categoria: '',
@@ -114,29 +156,44 @@ const handleSubmit = async () => {
       await api.post(`/dashboard/categorias/${currentItem.value.id_categoria}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
+      showToast('Categoría actualizada correctamente')
     } else {
       await api.post('/dashboard/categorias', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
+      showToast('Categoría creada correctamente')
     }
     showModal.value = false
     fetchCategories(pagination.value.current_page)
   } catch (err) {
-    alert(err.response?.data?.error || 'Error al guardar')
+    showToast(err.response?.data?.error || 'Error al guardar', 'error')
   }
 }
 
-const deleteItem = async (id) => {
-  if (!confirm('¿Estás seguro de eliminar esta categoría? Solo se podrá eliminar si no tiene productos asociados.')) return
+const confirmDelete = (id) => {
+  itemToDelete.value = id
+  showDeleteModal.value = true
+}
+
+const deleteItem = async () => {
+  if (!itemToDelete.value) return
   try {
-    await api.delete(`/dashboard/categorias/${id}`)
+    await api.delete(`/dashboard/categorias/${itemToDelete.value}`)
+    showToast('Categoría eliminada correctamente')
     fetchCategories(pagination.value.current_page)
+    showDeleteModal.value = false
+    itemToDelete.value = null
   } catch (err) {
-    alert(err.response?.data?.error || 'Error al eliminar')
+    showToast(err.response?.data?.error || 'Error al eliminar', 'error')
+    showDeleteModal.value = false
   }
 }
 
-const getImageUrl = getCategoryImageUrl
+const getImageUrl = (img) => {
+  if (!img) return null
+  if (img.startsWith('http')) return img
+  return `http://localhost:8000/assets/img/Categorias/${img}`
+}
 
 onMounted(fetchCategories)
 </script>
@@ -209,7 +266,7 @@ onMounted(fetchCategories)
               <td class="px-6 py-3 text-right">
                 <div class="flex justify-end gap-1">
                   <button @click="openModal(cat)" class="p-2 text-neutral-400 hover:text-brand-900 hover:bg-brand-50 rounded-lg transition-colors"><Edit :size="16" /></button>
-                  <button @click="deleteItem(cat.id_categoria)" class="p-2 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-lg transition-colors"><Trash2 :size="16" /></button>
+                  <button @click="confirmDelete(cat.id_categoria)" class="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 :size="16" /></button>
                 </div>
               </td>
             </tr>
@@ -255,7 +312,15 @@ onMounted(fetchCategories)
     </div>
 
     <!-- MODAL -->
-    <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div class="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm" @click="showModal = false"></div>
       
       <div class="relative bg-white w-full max-w-md max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
@@ -314,5 +379,47 @@ onMounted(fetchCategories)
         </div>
       </div>
     </div>
+    </Transition>
+
+    <!-- Delete Confirmation Modal -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div v-if="showDeleteModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm" @click="showDeleteModal = false"></div>
+        
+        <div class="relative bg-white rounded-[2rem] w-full max-w-md shadow-2xl border border-neutral-100 overflow-hidden">
+          <div class="p-8 text-center">
+            <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle class="text-red-500" :size="32" />
+            </div>
+            <h3 class="text-xl font-bold text-neutral-900 mb-2">¿Confirmar eliminación?</h3>
+            <p class="text-sm text-neutral-500 font-medium mb-8">
+              Esta acción no se puede deshacer. La categoría será eliminada permanentemente.
+            </p>
+            
+            <div class="flex gap-3">
+              <button 
+                @click="showDeleteModal = false"
+                class="flex-1 px-6 py-3 rounded-xl bg-neutral-100 text-neutral-600 font-bold text-xs hover:bg-neutral-200 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button 
+                @click="deleteItem"
+                class="flex-1 px-6 py-3 rounded-xl bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>

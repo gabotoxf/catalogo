@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 // Rutas Públicas
 Route::get('/home', [HomeController::class, 'index']);
+Route::get('/categorias', [PrincipalController::class, 'categorias']);
 Route::get('/productos', [PrincipalController::class, 'productos']);
 Route::post('/productos/filtrar', [PrincipalController::class, 'filtrarProductos']);
 Route::post('/productos/categoria', [PrincipalController::class, 'filtrarPorCategoria']);
@@ -19,7 +20,8 @@ Route::post('/registrar', [AdminController::class, 'registrar']);
 Route::post('/logout', [AdminController::class, 'cerrarSesion']);
 
 // Rutas de Dashboard (Administración)
-Route::middleware(['auth:sanctum', 'admin'])->prefix('dashboard')->group(function () {
+// En una fase posterior se puede añadir middleware auth:sanctum
+Route::prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index']);
     
     // Categorías

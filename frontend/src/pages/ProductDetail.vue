@@ -1,10 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ShoppingCart, Heart, Share2, ArrowLeft, Star, ShieldCheck, Truck, RotateCcw, Minus, Plus } from 'lucide-vue-next'
+import { ShoppingCart, ArrowLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-vue-next'
 import api from '../api/axios'
 import { useCartStore } from '../stores/cart'
-import { getProductImageUrl } from '../utils/helpers'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,7 +38,11 @@ const addToCart = () => {
   }
 }
 
-const getImageUrl = getProductImageUrl
+const getImageUrl = (img) => {
+  if (!img) return null
+  if (img.startsWith('http')) return img
+  return `http://localhost:8000/assets/img/Productos/${img}`
+}
 
 onMounted(fetchProduct)
 </script>
