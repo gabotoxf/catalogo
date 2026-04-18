@@ -34,8 +34,7 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configurar Nginx con puerto fijo 80
-COPY --chown=root:root /dev/null /etc/nginx/sites-available/default
+# Configurar Nginx
 RUN printf 'server {\n\
     listen 80;\n\
     root /var/www/html/public;\n\
@@ -54,17 +53,13 @@ RUN printf 'server {\n\
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-# Script: primero el puerto, luego php-fpm, luego nginx en foreground
 RUN printf '#!/bin/bash\nset -e\n\
 cd /var/www/html\n\
 php artisan migrate --force\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
-# Reemplazar puerto antes de iniciar nginx\n\
 sed -i "s/listen 80/listen ${PORT:-80}/g" /etc/nginx/sites-available/default\n\
-# Iniciar php-fpm en background\n\
 php-fpm -D\n\
-# Iniciar nginx en foreground\n\
 exec nginx -g "daemon off;"\n' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80
