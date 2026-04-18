@@ -11,6 +11,7 @@ FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
     nginx \
+    supervisor \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
@@ -34,9 +35,9 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configurar Nginx
+# Configurar Nginx — puerto fijo 8080 (Railway lo mapea igual)
 RUN printf 'server {\n\
-    listen 80;\n\
+    listen 8080;\n\
     root /var/www/html/public;\n\
     index index.php index.html;\n\
     location / {\n\
@@ -50,18 +51,44 @@ RUN printf 'server {\n\
     }\n\
 }\n' > /etc/nginx/sites-available/default
 
+# Quitar el puerto 80 del nginx.conf principal
+RUN sed -i 's/listen 80 default_server;//g' /etc/nginx/nginx.conf || true
+RUN sed -i 's/listen \[::\]:80 default_server;//g' /etc/nginx/nginx.conf || true
+
+# Configurar supervisord
+RUN printf '[supervisord]\n\
+nodaemon=true\n\
+logfile=/var/log/supervisord.log\n\
+\n\
+[program:php-fpm]\n\
+command=php-fpm -F\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/dev/stdout\n\
+stdout_logfile_maxbytes=0\n\
+stderr_logfile=/dev/stderr\n\
+stderr_logfile_maxbytes=0\n\
+\n\
+[program:nginx]\n\
+command=nginx -g "daemon off;"\n\
+autostart=true\n\
+autorestart=true\n\
+stdout_logfile=/dev/stdout\n\
+stdout_logfile_maxbytes=0\n\
+stderr_logfile=/dev/stderr\n\
+stderr_logfile_maxbytes=0\n' > /etc/supervisor/conf.d/supervisord.conf
+
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
+# Script de inicio
 RUN printf '#!/bin/bash\nset -e\n\
 cd /var/www/html\n\
 php artisan migrate --force\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
-sed -i "s/listen 80/listen ${PORT:-80}/g" /etc/nginx/sites-available/default\n\
-php-fpm -D\n\
-exec nginx -g "daemon off;"\n' > /start.sh && chmod +x /start.sh
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh && chmod +x /start.sh
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["/start.sh"]
