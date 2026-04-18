@@ -1,6 +1,17 @@
 # --- Etapa 1: Frontend ---
 FROM node:20-slim AS frontend-build
 WORKDIR /app/frontend
+
+# Declarar los ARGs
+ARG VITE_API_BASE_URL
+ARG VITE_IMAGE_BASE_URL
+ARG VITE_CAT_IMAGE_BASE_URL
+
+# Convertirlos en ENV para que Vite los lea
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_IMAGE_BASE_URL=$VITE_IMAGE_BASE_URL
+ENV VITE_CAT_IMAGE_BASE_URL=$VITE_CAT_IMAGE_BASE_URL
+
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ ./
