@@ -40,7 +40,7 @@ RUN chown -R www-data:www-data /var/www/html \
 
 # Configurar Nginx
 RUN echo 'server { \n\
-    listen ${PORT:-80}; \n\
+    listen 80; \n\
     root /var/www/html/public; \n\
     index index.php; \n\
     location / { \n\
@@ -59,15 +59,12 @@ ENV APP_DEBUG=false
 
 # Script de inicio
 RUN printf '#!/bin/bash\nset -e\n\
-# Reemplazar puerto dinamico en nginx\n\
-sed -i "s/\${PORT:-80}/${PORT:-80}/g" /etc/nginx/sites-available/default\n\
-# Laravel\n\
 cd /var/www/html\n\
 php artisan migrate --force\n\
 php artisan config:cache\n\
 php artisan route:cache\n\
-# Iniciar php-fpm y nginx\n\
 php-fpm -D\n\
+sed -i "s/listen 80/listen ${PORT:-80}/g" /etc/nginx/sites-available/default\n\
 nginx -g "daemon off;"\n\
 ' > /start.sh && chmod +x /start.sh
 
