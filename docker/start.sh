@@ -24,8 +24,8 @@ php artisan migrate --force
 echo "[start] Caching Laravel configuration..."
 php artisan config:cache
 
-echo "[start] Caching Laravel routes..."
-php artisan route:cache
+# NOTE: no route:cache — web.php usa una ruta closure (SPA catch-all)
+# y `route:cache` falla con "Unable to prepare route for serialization".
 
 # ---------------------------------------------------------------------------
 # 3. Start PHP-FPM and Nginx via supervisord (keeps the container alive)

@@ -2,12 +2,13 @@
 FROM node:20-slim AS frontend-build
 WORKDIR /app/frontend
 
-# Declarar los ARGs
-ARG VITE_API_BASE_URL
-ARG VITE_IMAGE_BASE_URL
-ARG VITE_CAT_IMAGE_BASE_URL
+# Mismo origen por defecto: el monolito sirve API + frontend desde un solo
+# dominio, así no hace falta conocer la URL de Render en tiempo de build.
+# Se pueden sobreescribir con --build-arg si se separa el frontend.
+ARG VITE_API_BASE_URL=/api
+ARG VITE_IMAGE_BASE_URL=/assets/img/Productos
+ARG VITE_CAT_IMAGE_BASE_URL=/assets/img/Categorias
 
-# Convertirlos en ENV para que Vite los lea
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_IMAGE_BASE_URL=$VITE_IMAGE_BASE_URL
 ENV VITE_CAT_IMAGE_BASE_URL=$VITE_CAT_IMAGE_BASE_URL
@@ -32,46 +33,34 @@ RUN apt-get update && apt-get install -y \
     curl \
     libzip-dev \
     libicu-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+    libpq-dev \
+    && docker-php-ext-install pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip intl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
 
 COPY backend/ .
 COPY --from=frontend-build /app/frontend/dist/ ./public/
+RUN mkdir -p public/assets/img/Productos public/assets/img/Categorias \
+    storage/framework/sessions storage/framework/views storage/framework/cache \
+    storage/logs bootstrap/cache
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Nginx config
-RUN printf 'server {\n\
-    listen 80;\n\
-    root /var/www/html/public;\n\
-    index index.php index.html;\n\
-    location / {\n\
-        try_files $uri $uri/ /index.php?$query_string;\n\
-    }\n\
-    location ~ \\.php$ {\n\
-        fastcgi_pass 127.0.0.1:9000;\n\
-        fastcgi_index index.php;\n\
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;\n\
-        include fastcgi_params;\n\
-    }\n\
-}\n' > /etc/nginx/sites-available/default
+# Config ya preparada para $PORT (Render/Railway lo inyectan, default 80)
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/start.sh /start.sh
 
 RUN rm -f /etc/nginx/sites-enabled/default \
-    && ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
-# Supervisord config
-RUN printf '[supervisord]\nnodaemon=true\nuser=root\nlogfile=/var/log/supervisord.log\n\n[program:php-fpm]\ncommand=php-fpm -F\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n\n[program:nginx]\ncommand=nginx -g "daemon off;"\nautostart=true\nautorestart=true\nstdout_logfile=/dev/stdout\nstdout_logfile_maxbytes=0\nstderr_logfile=/dev/stderr\nstderr_logfile_maxbytes=0\n' > /etc/supervisor/conf.d/supervisord.conf
+    && chmod +x /start.sh \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false
-
-RUN printf '#!/bin/bash\nset -e\ncd /var/www/html\nphp artisan migrate --force\nphp artisan config:cache\nphp artisan route:cache\nexec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf\n' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80
 
