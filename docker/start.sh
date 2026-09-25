@@ -24,6 +24,9 @@ php artisan migrate --force
 echo "[start] Seeding catalog (idempotent)..."
 php artisan db:seed --force
 
+echo "[start] Fetching product images (skips existing)..."
+php artisan catalogo:imagenes || true
+
 echo "[start] Caching Laravel configuration..."
 php artisan config:cache
 
