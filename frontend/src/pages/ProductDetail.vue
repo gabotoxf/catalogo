@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ShoppingCart, ArrowLeft, ShieldCheck, Truck, RotateCcw } from 'lucide-vue-next'
 import api from '../api/axios'
 import { useCartStore } from '../stores/cart'
+import ProductImage from '../components/products/ProductImage.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -38,12 +39,6 @@ const addToCart = () => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
-
 onMounted(fetchProduct)
 </script>
 
@@ -69,10 +64,10 @@ onMounted(fetchProduct)
       <!-- Image -->
       <div class="flex-1 w-full">
         <div class="aspect-square bg-white rounded-[3rem] overflow-hidden border border-brand-100 shadow-xl shadow-brand-900/5 group">
-          <img 
-            :src="getImageUrl(product.imagen_producto)" 
-            :alt="product.nombre_producto" 
-            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+          <ProductImage
+            :src="product.imagen_producto"
+            :alt="product.nombre_producto"
+            img-class="transition-transform duration-700 group-hover:scale-105"
           />
         </div>
       </div>

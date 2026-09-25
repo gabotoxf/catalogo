@@ -1,7 +1,7 @@
 <script setup>
-import { ShoppingCart, ShoppingBasket, Eye, Plus } from 'lucide-vue-next'
+import { ShoppingCart, Eye, Plus } from 'lucide-vue-next'
 import { useCartStore } from '../../stores/cart'
-import { getProductImageUrl } from '../../utils/helpers'
+import ProductImage from './ProductImage.vue'
 
 const props = defineProps({
   product: {
@@ -21,16 +21,11 @@ const addToCart = () => {
   <div class="group relative bg-white rounded-3xl border border-brand-100 hover:border-brand-300 transition-all duration-300 hover:shadow-xl hover:shadow-brand-900/5 overflow-hidden">
     <!-- Image & Badge Container -->
     <div class="relative aspect-[1/1] overflow-hidden bg-brand-50">
-      <img 
-        v-if="product.image"
-        :src="getProductImageUrl(product.image)" 
-        :alt="product.name" 
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+      <ProductImage
+        :src="product.image"
+        :alt="product.name"
+        img-class="transition-transform duration-700 group-hover:scale-110"
       />
-      <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2 bg-brand-50 text-brand-300">
-        <ShoppingBasket :size="48" :stroke-width="1.5" />
-        <span class="text-[10px] font-black uppercase tracking-widest">Del campo</span>
-      </div>
       
       <!-- Badges -->
       <div class="absolute top-3 left-3 flex flex-col gap-2">
