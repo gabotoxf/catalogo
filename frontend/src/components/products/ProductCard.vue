@@ -1,6 +1,7 @@
 <script setup>
-import { ShoppingCart, Eye, Plus } from 'lucide-vue-next'
+import { ShoppingCart, ShoppingBasket, Eye, Plus } from 'lucide-vue-next'
 import { useCartStore } from '../../stores/cart'
+import { getProductImageUrl } from '../../utils/helpers'
 
 const props = defineProps({
   product: {
@@ -14,12 +15,6 @@ const cartStore = useCartStore()
 const addToCart = () => {
   cartStore.addToCart(props.product)
 }
-
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
 </script>
 
 <template>
@@ -27,10 +22,15 @@ const getImageUrl = (img) => {
     <!-- Image & Badge Container -->
     <div class="relative aspect-[1/1] overflow-hidden bg-brand-50">
       <img 
-        :src="getImageUrl(product.image)" 
+        v-if="product.image"
+        :src="getProductImageUrl(product.image)" 
         :alt="product.name" 
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
       />
+      <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2 bg-brand-50 text-brand-300">
+        <ShoppingBasket :size="48" :stroke-width="1.5" />
+        <span class="text-[10px] font-black uppercase tracking-widest">Del campo</span>
+      </div>
       
       <!-- Badges -->
       <div class="absolute top-3 left-3 flex flex-col gap-2">

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../api/axios'
 import ProductCard from '../components/products/ProductCard.vue'
@@ -17,6 +17,13 @@ const priceMax = ref('')
 const sortOption = ref('')
 const currentPage = ref(1)
 const totalPages = ref(1)
+const inStockOnly = ref(false)
+
+const visibleProducts = computed(() =>
+  inStockOnly.value
+    ? products.value.filter((p) => (p.cantidad_producto ?? 1) > 0)
+    : products.value
+)
 
 const fetchCategories = async () => {
   try {
@@ -177,7 +184,7 @@ watch(() => route.query.search, (newQuery) => {
           <!-- STOCK / DISPONIBILIDAD -->
           <div>
             <label class="flex items-center gap-2 text-sm text-neutral-600 cursor-pointer">
-              <input type="checkbox" v-model="inStockOnly" @change="applyStockFilter" class="accent-brand-900" />
+              <input type="checkbox" v-model="inStockOnly" class="accent-brand-900" />
               Solo disponibles
             </label>
           </div>
@@ -194,7 +201,7 @@ watch(() => route.query.search, (newQuery) => {
             <h1 class="text-2xl font-black text-brand-900 uppercase tracking-tight">
               {{ searchQuery ? `Resultados para "${searchQuery}"` : 'Nuestros Productos' }}
             </h1>
-            <p class="text-brand-500 text-sm font-medium mt-1">{{ products.length }} productos encontrados</p>
+            <p class="text-brand-500 text-sm font-medium mt-1">{{ visibleProducts.length }} productos encontrados</p>
           </div>
           <div class="hidden sm:block">
             <span
@@ -219,9 +226,9 @@ watch(() => route.query.search, (newQuery) => {
           </div>
         </div>
 
-        <div v-else-if="products.length > 0" class="space-y-12">
+        <div v-else-if="visibleProducts.length > 0" class="space-y-12">
           <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            <ProductCard v-for="product in products" :key="product.id_producto" :product="{
+            <ProductCard v-for="product in visibleProducts" :key="product.id_producto" :product="{
               id: product.id_producto,
               name: product.nombre_producto,
               price: product.precio_producto,

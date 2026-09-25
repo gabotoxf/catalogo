@@ -92,6 +92,18 @@ router.beforeEach((to, from, next) => {
   const baseTitle = 'Chaparro Ecommerce'
   const pageTitle = to.meta.title ? `${to.meta.title} | ${baseTitle}` : baseTitle
   document.title = pageTitle
+
+  if (to.path.startsWith('/dashboard')) {
+    const token = localStorage.getItem('token')
+    const user = JSON.parse(localStorage.getItem('user') || 'null')
+    if (!token) return next('/login')
+    if (user?.rol_usuario != 1) return next('/')
+  }
+  if (to.path === '/login' && localStorage.getItem('token')) {
+    const user = JSON.parse(localStorage.getItem('user') || 'null')
+    return next(user?.rol_usuario == 1 ? '/dashboard' : '/')
+  }
+
   next()
 })
 
