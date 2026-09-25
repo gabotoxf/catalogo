@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import api from '../api/axios'
+import { getCategoryImageUrl } from '../utils/helpers'
 import Skeleton from '../components/layout/Skeleton.vue'
 import Toastify from 'toastify-js'
 import 'toastify-js/src/toastify.css'
@@ -189,11 +190,7 @@ const deleteItem = async () => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Categorias/${img}`
-}
+const getImageUrl = (img) => getCategoryImageUrl(img)
 
 onMounted(fetchCategories)
 </script>

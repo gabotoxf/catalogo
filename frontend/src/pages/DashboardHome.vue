@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../api/axios'
+import { getProductImageUrl } from '../utils/helpers'
 import Skeleton from '../components/layout/Skeleton.vue'
 import {
   Package,
@@ -34,11 +35,7 @@ const fetchDashboardData = async () => {
   }
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = (img) => getProductImageUrl(img)
 
 onMounted(fetchDashboardData)
 </script>

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../../api/axios'
+import { getCategoryImageUrl } from '../../utils/helpers'
 import { RouterLink } from 'vue-router'
 import { ArrowRight, Leaf, Apple, Milk, Beef, Wheat, Egg, Package } from 'lucide-vue-next'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -38,11 +39,7 @@ const getCategoryIcon = (name) => {
   return icons[name] || Package
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Categorias/${img}`
-}
+const getImageUrl = (img) => getCategoryImageUrl(img)
 </script>
 
 <template>

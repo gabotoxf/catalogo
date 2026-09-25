@@ -15,10 +15,8 @@ const quantity = ref(1)
 
 const fetchProduct = async () => {
   try {
-    const response = await api.get('/productos')
-    const products = response.data.productos.data || response.data.productos || []
-    const found = products.find(p => p.id_producto == route.params.id)
-    product.value = found
+    const response = await api.get(`/productos/${route.params.id}`)
+    product.value = response.data
   } catch (err) {
     console.error(err)
   } finally {

@@ -27,6 +27,9 @@ php artisan db:seed --force
 echo "[start] Fetching product images (skips existing)..."
 php artisan catalogo:imagenes || true
 
+echo "[start] Clearing stale cache..."
+php artisan cache:clear || true
+
 echo "[start] Caching Laravel configuration..."
 php artisan config:cache
 

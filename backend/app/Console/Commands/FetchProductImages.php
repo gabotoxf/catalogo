@@ -68,6 +68,48 @@ class FetchProductImages extends Command
 
     private function buscar(string $termino): ?string
     {
+        return $this->buscarOpenverse($termino) ?? $this->buscarCommons($termino);
+    }
+
+    // Openverse (sin clave): agrega Flickr y otros con licencia libre,
+    // suele acertar mejor que Commons para comida.
+    private function buscarOpenverse(string $termino): ?string
+    {
+        try {
+            $res = Http::withHeaders(['User-Agent' => 'ChaparroEcommerce/1.0'])
+                ->timeout(15)->retry(2, 1000)->get('https://api.openverse.org/v1/images/', [
+                    'q' => $termino,
+                    'page_size' => 10,
+                    'filter_dead' => 'false',
+                ]);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (! $res->successful()) {
+            return null;
+        }
+
+        $objetivo = $this->normalizar($termino);
+        $primera = strtok($objetivo, ' ') ?: $objetivo;
+
+        foreach ($res->json('results') ?? [] as $item) {
+            if (! empty($item['mature'])) {
+                continue;
+            }
+            $titulo = $this->normalizar(($item['title'] ?? '').' '.collect($item['tags'] ?? [])->pluck('name')->implode(' '));
+            if (str_contains($titulo, $objetivo) || str_contains($titulo, $primera)) {
+                if (! empty($item['url'])) {
+                    return $item['url'];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function buscarCommons(string $termino): ?string
+    {
         try {
             $res = Http::withHeaders(['User-Agent' => 'ChaparroEcommerce/1.0'])
                 ->timeout(15)->retry(2, 1000)->get('https://commons.wikimedia.org/w/api.php', [

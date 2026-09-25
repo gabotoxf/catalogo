@@ -81,4 +81,15 @@ class PrincipalController extends Controller
     {
         return $this->filtrarProductos($request);
     }
+
+    public function detalleProducto($id)
+    {
+        $producto = Producto::with('categoria')->find($id);
+
+        if (! $producto) {
+            return response()->json(['message' => 'Producto no encontrado'], 404);
+        }
+
+        return response()->json($producto);
+    }
 }

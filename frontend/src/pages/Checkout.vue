@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
+import { getProductImageUrl } from '../utils/helpers'
 import { 
   User, 
   Phone, 
@@ -51,11 +52,7 @@ const handleCheckout = () => {
   }, 2000)
 }
 
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
-}
+const getImageUrl = (img) => getProductImageUrl(img)
 </script>
 
 <template>

@@ -19,7 +19,7 @@ class DashboardController extends Controller
                 'totalProductos' => Producto::count(),
                 'totalCategorias' => Categoria::count(),
                 'stockBajo' => Producto::where('cantidad_producto', '<', 10)->count(),
-                'valorInventario' => Producto::sum(DB::raw('precio_producto * IFNULL(cantidad_producto, 0)')),
+                'valorInventario' => Producto::sum(DB::raw('precio_producto * COALESCE(cantidad_producto, 0)')),
             ];
         });
 

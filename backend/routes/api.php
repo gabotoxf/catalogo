@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/home', [HomeController::class, 'index']);
 Route::get('/categorias', [PrincipalController::class, 'categorias']);
 Route::get('/productos', [PrincipalController::class, 'productos']);
+Route::get('/productos/{id}', [PrincipalController::class, 'detalleProducto']);
 Route::post('/productos/filtrar', [PrincipalController::class, 'filtrarProductos']);
 Route::post('/productos/categoria', [PrincipalController::class, 'filtrarPorCategoria']);
 
