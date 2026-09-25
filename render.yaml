@@ -41,7 +41,7 @@ services:
           name: ecommerce-db
           property: password
       - key: SESSION_DRIVER
-        value: database
+        value: file # ponytail: database exigiría migración de tabla sessions que no existe
       - key: CACHE_STORE
         value: database
       - key: QUEUE_CONNECTION
