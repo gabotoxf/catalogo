@@ -79,7 +79,7 @@ const getImageUrl = (img) => getCategoryImageUrl(img)
       :modules="[Autoplay, FreeMode]"
       :slides-per-view="2.5"
       :space-between="16"
-      :loop="true"
+      :loop="categories.length > 6"
       :free-mode="true"
       :autoplay="{ delay: 4000, disableOnInteraction: false }"
       :breakpoints="{

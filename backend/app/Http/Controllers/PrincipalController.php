@@ -54,10 +54,12 @@ class PrincipalController extends Controller
         }
 
         if ($categoriaId) {
-            // Acepta slug o id de categoría
-            $catId = Categoria::where('slug_categoria', $categoriaId)
-                ->orWhere('id_categoria', $categoriaId)
-                ->value('id_categoria') ?? $categoriaId;
+            // Acepta slug o id de categoría (el id solo si es numérico: Postgres)
+            $catQuery = Categoria::where('slug_categoria', $categoriaId);
+            if (is_numeric($categoriaId)) {
+                $catQuery->orWhere('id_categoria', (int) $categoriaId);
+            }
+            $catId = $catQuery->value('id_categoria') ?? $categoriaId;
             $productosQuery->where('categoria_id', $catId);
         }
 
@@ -88,10 +90,12 @@ class PrincipalController extends Controller
 
     public function detalleProducto($slug)
     {
-        // Acepta slug o id (los links viejos con id siguen funcionando)
+        // Acepta slug o id (los links viejos con id siguen funcionando).
+        // El id solo se compara si es numérico: en Postgres comparar
+        // entero con texto da 500.
         $producto = Producto::with('categoria')
             ->where('slug_producto', $slug)
-            ->orWhere('id_producto', $slug)
+            ->when(is_numeric($slug), fn ($q) => $q->orWhere('id_producto', (int) $slug))
             ->first();
 
         if (! $producto) {
