@@ -348,7 +348,7 @@ class FetchProductImages extends Command
             $res = Http::withHeaders([
                 'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36',
                 'Accept-Language' => 'es-CO,es;q=0.9',
-            ])->timeout(20)->get('https://www.google.com/search', [
+            ])->timeout(10)->get('https://www.google.com/search', [
                 'tbm' => 'isch',
                 'q' => $termino.' producto fresco',
             ]);

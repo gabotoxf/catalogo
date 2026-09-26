@@ -28,7 +28,8 @@ class TiendaSeeder extends Seeder
         $catIds = [];
         foreach (['Verduras', 'Frutas', 'Tubérculos', 'Lácteos y Huevos', 'Granos y Despensa', 'Hierbas y Aromáticas'] as $nombre) {
             $c = Categoria::firstOrCreate(['nombre_categoria' => $nombre]);
-            if (! $c->imagen_categoria && isset($imagenesCat[$nombre])) {
+            if (isset($imagenesCat[$nombre])
+                && (! $c->imagen_categoria || str_starts_with($c->imagen_categoria, 'http'))) {
                 $c->update(['imagen_categoria' => $imagenesCat[$nombre]]);
             }
             $catIds[$nombre] = $c->id_categoria;
@@ -192,8 +193,10 @@ class TiendaSeeder extends Seeder
                     'imagen_producto' => $imagenes[$nombre] ?? null,
                 ]
             );
-            // Filas creadas antes del mapa: rellena imagen sin tocar lo demás
-            if (! $p->imagen_producto && isset($imagenes[$nombre])) {
+            // Rellena imagen vacía o hotlink viejo con la curada local,
+            // sin tocar precio/stock/descripción (los maneja el dashboard)
+            if (isset($imagenes[$nombre])
+                && (! $p->imagen_producto || str_starts_with($p->imagen_producto, 'http'))) {
                 $p->update(['imagen_producto' => $imagenes[$nombre]]);
             }
         }
