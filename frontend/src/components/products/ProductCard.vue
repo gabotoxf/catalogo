@@ -47,7 +47,7 @@ const addToCart = () => {
           <Plus :size="24" />
         </button>
         <RouterLink 
-          :to="{ name: 'product-detail', params: { id: product.id }}"
+          :to="{ name: 'product-detail', params: { slug: product.slug || product.id }}"
           class="w-12 h-12 bg-white text-brand-900 rounded-full shadow-xl flex items-center justify-center hover:bg-brand-900 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
           title="Ver detalle"
         >

@@ -54,7 +54,11 @@ class PrincipalController extends Controller
         }
 
         if ($categoriaId) {
-            $productosQuery->where('categoria_id', $categoriaId);
+            // Acepta slug o id de categoría
+            $catId = Categoria::where('slug_categoria', $categoriaId)
+                ->orWhere('id_categoria', $categoriaId)
+                ->value('id_categoria') ?? $categoriaId;
+            $productosQuery->where('categoria_id', $catId);
         }
 
         if ($sort === 'price_asc') {
@@ -82,14 +86,26 @@ class PrincipalController extends Controller
         return $this->filtrarProductos($request);
     }
 
-    public function detalleProducto($id)
+    public function detalleProducto($slug)
     {
-        $producto = Producto::with('categoria')->find($id);
+        // Acepta slug o id (los links viejos con id siguen funcionando)
+        $producto = Producto::with('categoria')
+            ->where('slug_producto', $slug)
+            ->orWhere('id_producto', $slug)
+            ->first();
 
         if (! $producto) {
             return response()->json(['message' => 'Producto no encontrado'], 404);
         }
 
-        return response()->json($producto);
+        $relacionados = Producto::with('categoria:id_categoria,nombre_categoria')
+            ->where('categoria_id', $producto->categoria_id)
+            ->where('id_producto', '!=', $producto->id_producto)
+            ->take(4)->get();
+
+        return response()->json(array_merge(
+            $producto->toArray(),
+            ['relacionados' => $relacionados]
+        ));
     }
 }

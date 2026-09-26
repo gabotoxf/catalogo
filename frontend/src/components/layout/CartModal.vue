@@ -9,6 +9,7 @@ import {
 import { ShoppingBag, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../../stores/cart'
+import ProductImage from '../products/ProductImage.vue'
 import Skeleton from './Skeleton.vue'
 
 const props = defineProps({
@@ -35,12 +36,6 @@ const removeFromCart = (id) => {
 const goToCheckout = () => {
   router.push('/checkout')
   handleClose()
-}
-
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
 }
 </script>
 
@@ -89,7 +84,7 @@ const getImageUrl = (img) => {
                     <div v-if="cartStore.cartItems.length > 0" class="divide-y divide-brand-50">
                       <div v-for="product in cartStore.cartItems" :key="product.id" class="flex gap-4 py-4 first:pt-0">
                         <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded border border-brand-100">
-                          <img :src="getImageUrl(product.image)" :alt="product.name" class="h-full w-full object-cover" />
+                          <ProductImage :src="product.image" :alt="product.name" />
                         </div>
 
                         <div class="flex flex-1 flex-col justify-between">

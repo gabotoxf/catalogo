@@ -9,7 +9,7 @@ const producers = [
     location: 'Vereda El Hato',
     specialty: 'Papas y Tubérculos',
     story: 'Más de 30 años cultivando la tierra con métodos tradicionales y orgánicos.',
-    image: 'img/Banners/Papas2.jpg'
+    image: 'img/Campesinos/campesino.jfif'
   },
   {
     id: 2,
@@ -17,7 +17,7 @@ const producers = [
     location: 'Finca La Esperanza',
     specialty: 'Verduras de Hoja',
     story: 'Líder de la asociación local de mujeres productoras de hortalizas frescas.',
-    image: 'img/Banners/Verduras.jpg'
+    image: 'img/Campesinos/campesina.jfif'
   }
 ]
 </script>

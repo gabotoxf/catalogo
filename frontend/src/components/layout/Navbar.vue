@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/auth'
 import { ShoppingCart, User, Search, Menu, X, ChevronDown, MapPin, Truck, Tag, Users, Info, Loader2, ArrowRight } from 'lucide-vue-next'
 import CartModal from './CartModal.vue'
 import api from '../../api/axios'
+import ProductImage from '../products/ProductImage.vue'
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
@@ -66,7 +67,7 @@ watch(searchQuery, (newVal) => {
 })
 
 const selectSearchResult = (product) => {
-  router.push({ name: 'product-detail', params: { id: product.id_producto } })
+  router.push({ name: 'product-detail', params: { slug: product.slug_producto || product.id_producto } })
   showSearchResults.value = false
   searchQuery.value = ''
 }
@@ -78,12 +79,6 @@ const fetchCategories = async () => {
   } catch (err) {
     console.error('Error fetching categories', err)
   }
-}
-
-const getImageUrl = (img) => {
-  if (!img) return null
-  if (img.startsWith('http')) return img
-  return `http://localhost:8000/assets/img/Productos/${img}`
 }
 
 onMounted(() => {
@@ -141,8 +136,8 @@ onMounted(() => {
                 <button v-for="product in searchResults" :key="product.id_producto" @click="selectSearchResult(product)"
                   class="w-full flex items-center gap-4 p-4 hover:bg-brand-50 transition-colors text-left group">
                   <div class="h-12 w-12 rounded-xl overflow-hidden bg-brand-50 border border-brand-100 shrink-0">
-                    <img :src="getImageUrl(product.imagen_producto)"
-                      class="h-full w-full object-cover group-hover:scale-110 transition-transform" />
+                    <ProductImage :src="product.imagen_producto" :alt="product.nombre_producto"
+                      img-class="transition-transform duration-700 group-hover:scale-110" />
                   </div>
                   <div class="flex-1">
                     <h4 class="font-bold text-brand-900 text-sm uppercase tracking-tight">{{ product.nombre_producto }}
@@ -218,7 +213,7 @@ onMounted(() => {
                 class="absolute top-full left-0 w-64 bg-white border border-brand-100 shadow-xl rounded-b-xl py-4 z-50 max-h-[50vh] overflow-y-auto">
                 <div v-if="categories.length === 0" class="px-4 py-2 text-brand-400 font-normal">Cargando...</div>
                 <RouterLink v-for="cat in categories" :key="cat.id_categoria"
-                  :to="{ name: 'category-products', params: { id: cat.id_categoria } }"
+                  :to="{ name: 'category-products', params: { slug: cat.slug_categoria || cat.id_categoria } }"
                   class="block px-6 py-2.5 hover:bg-brand-50 hover:text-brand-900 transition-colors font-medium">
                   {{ cat.nombre_categoria }}
                 </RouterLink>
@@ -292,7 +287,7 @@ onMounted(() => {
           <span class="text-xs font-bold text-brand-400 uppercase tracking-widest px-2">Categorías</span>
           <div class="grid grid-cols-2 gap-2">
             <RouterLink v-for="cat in categories" :key="cat.id_categoria"
-              :to="{ name: 'category-products', params: { id: cat.id_categoria } }"
+              :to="{ name: 'category-products', params: { slug: cat.slug_categoria || cat.id_categoria } }"
               class="p-3 bg-brand-50 rounded-lg text-sm font-semibold text-brand-700" @click="isMenuOpen = false">
               {{ cat.nombre_categoria }}
             </RouterLink>

@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import api from '../api/axios'
-import { getProductImageUrl } from '../utils/helpers'
 import Skeleton from '../components/layout/Skeleton.vue'
+import ProductImage from '../components/products/ProductImage.vue'
 import {
   Package,
   Layers,
@@ -34,8 +34,6 @@ const fetchDashboardData = async () => {
     loading.value = false
   }
 }
-
-const getImageUrl = (img) => getProductImageUrl(img)
 
 onMounted(fetchDashboardData)
 </script>
@@ -154,7 +152,7 @@ onMounted(fetchDashboardData)
                   <td class="px-4 py-3 sm:px-6">
                     <div class="flex items-center gap-3">
                       <div class="h-9 w-9 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0">
-                        <img :src="getImageUrl(prod.imagen_producto)" class="h-full w-full object-cover" />
+                        <ProductImage :src="prod.imagen_producto" :alt="prod.nombre_producto" />
                       </div>
                       <div class="min-w-0">
                         <span class="font-semibold text-neutral-900 truncate block max-w-[140px] sm:max-w-none">{{

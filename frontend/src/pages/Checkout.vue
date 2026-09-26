@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
-import { getProductImageUrl } from '../utils/helpers'
+import ProductImage from '../components/products/ProductImage.vue'
 import { 
   User, 
   Phone, 
@@ -52,7 +52,6 @@ const handleCheckout = () => {
   }, 2000)
 }
 
-const getImageUrl = (img) => getProductImageUrl(img)
 </script>
 
 <template>
@@ -200,7 +199,7 @@ const getImageUrl = (img) => getProductImageUrl(img)
                 class="flex gap-4 items-center"
               >
                 <div class="h-20 w-20 shrink-0 rounded-2xl overflow-hidden border border-white/10 bg-white/5">
-                  <img :src="getImageUrl(item.image)" :alt="item.name" class="w-full h-full object-cover" />
+                  <ProductImage :src="item.image" :alt="item.name" />
                 </div>
                 <div class="flex-1">
                   <h4 class="font-bold text-sm leading-tight mb-1">{{ item.name }}</h4>

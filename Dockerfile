@@ -57,7 +57,7 @@ COPY docker/start.sh /start.sh
 RUN rm -f /etc/nginx/sites-enabled/default \
     && chmod +x /start.sh \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache public/assets/img
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false

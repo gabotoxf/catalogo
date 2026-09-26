@@ -25,8 +25,8 @@ import { getAssetUrl } from '../../utils/helpers'
     >
         <!-- SLIDE 1: General Value Proposition -->
         <SwiperSlide>
-            <div class="relative w-full h-full">
-                <img :src="getAssetUrl('img/Banners/Verduras.jpg')" alt="Campo Real" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="relative w-full h-full bg-brand-950">
+                <img :src="getAssetUrl('img/Banners/Verduras.jpg')" alt="Campo Real" fetchpriority="high" loading="eager" decoding="async" class="absolute inset-0 w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40"></div>
                 <div class="relative h-full max-w-[var(--max-width)] mx-auto px-4 md:px-6 flex flex-col justify-center items-start text-white">
                     <span class="inline-block px-4 py-1 bg-brand-500 text-white text-xs font-bold rounded-full mb-4 animate-fade-in uppercase tracking-widest">Directo del campo</span>
@@ -37,7 +37,7 @@ import { getAssetUrl } from '../../utils/helpers'
                         Productos frescos, sin intermediarios, directo de productores locales que cuidan la tierra.
                     </p>
                     <div class="flex flex-wrap gap-4">
-                        <RouterLink to="/productos" class="px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-brand-500/20 flex items-center gap-2 group">
+                        <RouterLink to="/productos" class="px-8 py-4 bg-brand-900 hover:bg-brand-900 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-brand-500/20 flex items-center gap-2 group">
                             Comprar ahora
                             <ArrowRight class="group-hover:translate-x-1 transition-transform" :size="20" />
                         </RouterLink>
@@ -51,8 +51,8 @@ import { getAssetUrl } from '../../utils/helpers'
 
         <!-- SLIDE 2: Authenticity / Farmers -->
         <SwiperSlide>
-            <div class="relative w-full h-full">
-                <img :src="getAssetUrl('img/Banners/Papas2.jpg')" alt="Productores Locales" class="absolute inset-0 w-full h-full object-cover" />
+            <div class="relative w-full h-full bg-brand-950">
+                <img :src="getAssetUrl('img/Banners/Papas2.jpg')" alt="Productores Locales" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40"></div>
                 <div class="relative h-full max-w-[var(--max-width)] mx-auto px-4 md:px-6 flex flex-col justify-center items-center text-center text-white">
                     <h1 class="text-4xl md:text-6xl font-black mb-6 leading-tight max-w-4xl">
@@ -62,10 +62,10 @@ import { getAssetUrl } from '../../utils/helpers'
                         Cada compra ayuda a familias campesinas y garantiza que consumas alimentos 100% naturales.
                     </p>
                     <div class="flex flex-wrap justify-center gap-4">
-                        <RouterLink to="/productores" class="px-10 py-4 bg-white text-brand-900 rounded-full font-bold transition-all shadow-xl hover:scale-105">
-                            Con conocer productores
+                        <RouterLink to="/productores" class="px-10 py-4 bg-brand-900 hover:bg-brand-900 text-white rounded-full font-bold transition-all shadow-lg hover:shadow-brand-500/20">
+                            Conocer productores
                         </RouterLink>
-                        <button class="px-8 py-4 bg-brand-500/20 hover:bg-brand-500/40 border border-brand-500/50 rounded-full font-bold transition-all flex items-center gap-2">
+                        <button class="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full font-bold transition-all gap-2 flex items-center justify-center cursor-pointer">
                             <Play :size="18" fill="currentColor" />
                             Ver nuestra historia
                         </button>

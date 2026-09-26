@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { routeLoading } from './utils/routeLoading'
 import Home from './pages/Home.vue'
 import Products from './pages/Products.vue'
 import ProductDetail from './pages/ProductDetail.vue'
@@ -24,7 +25,7 @@ const routes = [
     meta: { title: 'Productos' }
   },
   {
-    path: '/producto/:id',
+    path: '/producto/:slug',
     name: 'product-detail',
     component: ProductDetail,
     meta: { title: 'Detalle del Producto' }
@@ -42,7 +43,7 @@ const routes = [
     meta: { title: 'Finalizar Pedido' }
   },
   {
-    path: '/categoria/:id',
+    path: '/categoria/:slug',
     name: 'category-products',
     component: Products,
     meta: { title: 'Categoría' }
@@ -85,10 +86,14 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior() {
+    return { top: 0 }
+  }
 })
 
 router.beforeEach((to, from, next) => {
+  routeLoading.value = true
   const baseTitle = 'Chaparro Ecommerce'
   const pageTitle = to.meta.title ? `${to.meta.title} | ${baseTitle}` : baseTitle
   document.title = pageTitle
@@ -106,5 +111,8 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
+
+router.afterEach(() => (routeLoading.value = false))
+router.onError(() => (routeLoading.value = false))
 
 export default router

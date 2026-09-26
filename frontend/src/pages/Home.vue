@@ -11,6 +11,9 @@ import Producers from '../components/Home/Producers.vue'
 import HowItWorks from '../components/Home/HowItWorks.vue'
 import Promotions from '../components/Home/Promotions.vue'
 import Testimonials from '../components/Home/Testimonials.vue'
+import { waLink } from '../utils/whatsapp'
+
+const whatsappHref = waLink('Hola Chaparro, quiero hacer un pedido.')
 
 const categories = ref([])
 const featuredProducts = ref([])
@@ -71,6 +74,7 @@ onMounted(() => {
       <div v-else class="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
         <ProductCard v-for="product in featuredProducts" :key="product.id_producto" :product="{
           id: product.id_producto,
+          slug: product.slug_producto,
           name: product.nombre_producto,
           price: product.precio_producto,
           image: product.imagen_producto,
@@ -124,7 +128,7 @@ onMounted(() => {
               Ver productos
             </RouterLink>
             <a 
-              href="https://wa.me/tu-numero" 
+              :href="whatsappHref" 
               target="_blank"
               class="w-full sm:w-auto px-12 py-5 bg-white border-2 border-brand-100 text-brand-900 rounded-full text-xl font-black hover:border-brand-500 transition-all flex items-center justify-center gap-3"
             >

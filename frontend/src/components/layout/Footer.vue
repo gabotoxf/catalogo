@@ -1,5 +1,8 @@
 <script setup>
 import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, MessageCircle, CreditCard, Truck } from 'lucide-vue-next'
+import { waLink } from '../../utils/whatsapp'
+
+const whatsappHref = waLink('Hola Chaparro, quiero hacer un pedido.')
 </script>
 
 <template>
@@ -52,7 +55,7 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, MessageCircle, Credi
             <li class="flex items-center gap-3"><Mail :size="20" class="text-brand-500 shrink-0" /> contacto@chaparro.com</li>
           </ul>
           <a 
-            href="https://wa.me/tu-numero" 
+            :href="whatsappHref" 
             target="_blank"
             class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 px-6 rounded-2xl font-black shadow-xl hover:scale-105 transition-all w-full"
           >
@@ -73,6 +76,14 @@ import { Mail, Phone, MapPin, Facebook, Instagram, Twitter, MessageCircle, Credi
         <div class="text-brand-100/30 text-xs font-bold uppercase tracking-[0.2em] text-center md:text-right">
           &copy; {{ new Date().getFullYear() }} Chaparro Ecommerce. 
           <span class="block mt-1">Directo del campo a tu hogar.</span>
+          <span class="block mt-3 normal-case tracking-normal">
+            Desarrollado por
+            <a 
+              href="https://gabotoxf.vercel.app" 
+              target="_blank"
+              class="inline-block align-middle ml-1 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-brand-400 hover:bg-white/10 hover:border-white/20 hover:text-brand-300 transition-all duration-300 text-[11px] font-black uppercase tracking-widest"
+            >Gabotoxf</a>
+          </span>
         </div>
       </div>
     </div>

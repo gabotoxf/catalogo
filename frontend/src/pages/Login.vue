@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import api from '../api/axios'
-import { Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, User } from 'lucide-vue-next'
+import { Mail, Lock, Eye, EyeOff, Loader2, User } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -85,11 +85,8 @@ const switchMode = (m) => {
   <div class="min-h-screen flex items-center justify-center bg-brand-50 px-4">
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
-        <RouterLink to="/" class="inline-flex items-center gap-2 text-brand-400 hover:text-brand-900 text-xs font-bold uppercase tracking-wider mb-6 transition-colors">
-          <ArrowLeft :size="14" /> Volver a la tienda
-        </RouterLink>
-        <div class="bg-white p-4 rounded-lg inline-block shadow-sm mb-4">
-          <img src="/logo.jfif" alt="Logo" class="h-12 w-12 object-cover" />
+        <div class="bg-white p-4 rounded-2xl inline-block shadow-sm mb-4">
+          <img src="/logo.jfif" alt="Logo" class="h-16 w-16 object-cover rounded-xl mx-auto" />
         </div>
         <h1 class="text-2xl font-bold text-brand-900">{{ mode === 'login' ? 'Iniciar Sesión' : 'Crear cuenta' }}</h1>
         <p class="text-brand-500 text-sm mt-1">{{ mode === 'login' ? 'Accede a tu panel administrativo' : 'Compra directo del campo' }}</p>

@@ -10,7 +10,7 @@ const route = useRoute()
 const products = ref([])
 const categories = ref([])
 const loading = ref(true)
-const selectedCategory = ref(route.params.id || '')
+const selectedCategory = ref(route.params.slug || '')
 const searchQuery = ref(route.query.search || '')
 const priceMin = ref('')
 const priceMax = ref('')
@@ -86,8 +86,8 @@ onMounted(() => {
   fetchData()
 })
 
-watch(() => route.params.id, (newId) => {
-  selectedCategory.value = newId || ''
+watch(() => route.params.slug, (newSlug) => {
+  selectedCategory.value = newSlug || ''
   fetchData()
 })
 
@@ -230,6 +230,7 @@ watch(() => route.query.search, (newQuery) => {
           <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
             <ProductCard v-for="product in visibleProducts" :key="product.id_producto" :product="{
               id: product.id_producto,
+              slug: product.slug_producto,
               name: product.nombre_producto,
               price: product.precio_producto,
               image: product.imagen_producto,

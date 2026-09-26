@@ -24,8 +24,8 @@ php artisan migrate --force
 echo "[start] Seeding catalog (idempotent)..."
 php artisan db:seed --force
 
-echo "[start] Fetching product images (skips existing)..."
-php artisan catalogo:imagenes || true
+echo "[start] Fetching product images in background (skips existing)..."
+php artisan catalogo:imagenes > storage/logs/catalogo-imagenes.log 2>&1 || true &
 
 echo "[start] Clearing stale cache..."
 php artisan cache:clear || true

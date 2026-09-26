@@ -94,17 +94,18 @@ const getImageUrl = (img) => getCategoryImageUrl(img)
         :key="category.id_categoria"
       >
         <RouterLink
-          :to="{ name: 'category-products', params: { id: category.id_categoria } }"
+          :to="{ name: 'category-products', params: { slug: category.slug_categoria || category.id_categoria } }"
           class="category-card block group"
         >
           <!-- Contenedor de Imagen -->
           <div class="relative aspect-square rounded-2xl overflow-hidden bg-brand-50 border border-brand-100/50 transition-all duration-300 group-hover:shadow-lg group-hover:border-brand-200">
+            <div v-if="category.imagen_categoria" class="absolute inset-0 animate-pulse bg-brand-100"></div>
             <!-- Imagen de BD -->
             <img
               v-if="category.imagen_categoria"
               :src="getImageUrl(category.imagen_categoria)"
               :alt="category.nombre_categoria"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              class="relative w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <!-- Fallback Professional Icon (Only if no image) -->
             <div v-else class="absolute inset-0 flex items-center justify-center bg-brand-50">

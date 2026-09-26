@@ -5,6 +5,7 @@ import api from '../api/axios'
 import { getProductImageUrl } from '../utils/helpers'
 import Skeleton from '../components/layout/Skeleton.vue'
 import Toastify from 'toastify-js'
+import ProductImage from '../components/products/ProductImage.vue'
 import 'toastify-js/src/toastify.css'
 import { 
   Plus, 
@@ -279,7 +280,7 @@ onMounted(() => {
               <td class="px-6 py-3">
                 <div class="flex items-center gap-3">
                   <div class="h-10 w-10 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0">
-                    <img :src="getImageUrl(prod.imagen_producto)" class="h-full w-full object-cover" />
+                    <ProductImage :src="prod.imagen_producto" :alt="prod.nombre_producto" />
                   </div>
                   <div class="flex flex-col">
                     <span class="font-bold text-neutral-900 text-sm">{{ prod.nombre_producto }}</span>

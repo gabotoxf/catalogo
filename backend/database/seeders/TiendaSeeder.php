@@ -12,10 +12,102 @@ class TiendaSeeder extends Seeder
 {
     public function run(): void
     {
+        // <imagenes-cat-auto>
+        // Mapa categoría => archivo en public/assets/img/Categorias.
+        // Lo escribe `php artisan catalogo:imagenes --sync-seeder`; no editar a mano.
+        $imagenesCat = [
+            'Frutas' => 'frutas-2.jpg',
+            'Granos y Despensa' => 'granos-y-despensa-5.jpg',
+            'Hierbas y Aromáticas' => 'hierbas-y-aromaticas-6.jpg',
+            'Lácteos y Huevos' => 'lacteos-y-huevos-4.jpg',
+            'Tubérculos' => 'tuberculos-3.jpg',
+            'Verduras' => 'verduras-1.jpg',
+        ];
+        // </imagenes-cat-auto>
+
         $catIds = [];
         foreach (['Verduras', 'Frutas', 'Tubérculos', 'Lácteos y Huevos', 'Granos y Despensa', 'Hierbas y Aromáticas'] as $nombre) {
-            $catIds[$nombre] = Categoria::firstOrCreate(['nombre_categoria' => $nombre])->id_categoria;
+            $c = Categoria::firstOrCreate(['nombre_categoria' => $nombre]);
+            if (! $c->imagen_categoria && isset($imagenesCat[$nombre])) {
+                $c->update(['imagen_categoria' => $imagenesCat[$nombre]]);
+            }
+            $catIds[$nombre] = $c->id_categoria;
         }
+
+        // <imagenes-auto>
+        // Mapa nombre => archivo en public/assets/img/Productos.
+        // Lo escribe `php artisan catalogo:imagenes --sync-seeder`; no editar a mano.
+        $imagenes = [
+            'Acelga x manojo' => 'acelga-7.jpg',
+            'Aguacate hass x und' => 'aguacate-hass-20.jpg',
+            'Albahaca x manojo' => 'albahaca-63.jpg',
+            'Apio x manojo' => 'apio-16.jpg',
+            'Arequipe x 500g' => 'arequipe-47.jpg',
+            'Arracacha x kg' => 'arracacha-35.jpg',
+            'Arroz x kg' => 'arroz-53.jpg',
+            'Arveja verde x kg' => 'arveja-verde-14.jpg',
+            'Avena en hojuelas x kg' => 'avena-en-hojuelas-56.jpg',
+            'Azúcar morena x kg' => 'azucar-morena-58.jpg',
+            'Banano x kg' => 'banano-18.jpg',
+            'Batata x kg' => 'batata-39.jpg',
+            'Brócoli x und' => 'brocoli-9.jpg',
+            'Café molido x 500g' => 'cafe-molido-50.jpg',
+            'Cebolla cabezona x kg' => 'cebolla-cabezona-2.jpg',
+            'Chocolate de mesa x 500g' => 'chocolate-de-mesa-59.jpg',
+            'Cilantro x manojo' => 'cilantro-5.jpg',
+            'Coliflor x und' => 'coliflor-10.jpg',
+            'Cuajada x 250g' => 'cuajada-44.jpg',
+            'Espinaca x manojo' => 'espinaca-8.jpg',
+            'Fresa x canasta 500g' => 'fresa-19.jpg',
+            'Fríjol cargamanto x kg' => 'frijol-cargamanto-51.jpg',
+            'Garbanzo x kg' => 'garbanzo-55.jpg',
+            'Guanábana x kg' => 'guanabana-25.jpg',
+            'Habichuela x kg' => 'habichuela-15.jpg',
+            'Harina de maíz x kg' => 'harina-de-maiz-57.jpg',
+            'Huevos rojos AA x 30' => 'huevos-rojos-aa-41.jpg',
+            'Kumis x litro' => 'kumis-48.jpg',
+            'Laurel x manojo' => 'laurel-68.jpg',
+            'Leche entera x litro' => 'leche-entera-43.jpg',
+            'Lechuga crespa x und' => 'lechuga-crespa-4.jpg',
+            'Lenteja x kg' => 'lenteja-54.jpg',
+            'Lulo x kg' => 'lulo-21.jpg',
+            'Malanga x kg' => 'malanga-37.jpg',
+            'Mandarina x kg' => 'mandarina-29.jpg',
+            'Mango tommy x kg' => 'mango-tommy-17.jpg',
+            'Mantequilla x 250g' => 'mantequilla-46.jpg',
+            'Maracuyá x kg' => 'maracuya-24.jpg',
+            'Maíz pira x kg' => 'maiz-pira-62.jpg',
+            'Maíz tierno x docena' => 'maiz-tierno-52.jpg',
+            'Miel de abejas x 500g' => 'miel-de-abejas-60.jpg',
+            'Mora x canasta 500g' => 'mora-26.jpg',
+            'Orégano x manojo' => 'oregano-65.jpg',
+            'Panela x kg' => 'panela-49.jpg',
+            'Papa criolla x kg' => 'papa-criolla-32.jpg',
+            'Papa pastusa x 5kg' => 'papa-pastusa-31.jpg',
+            'Papa sabanera x kg' => 'papa-sabanera-40.jpg',
+            'Papaya x kg' => 'papaya-22.jpg',
+            'Pepino cohombro x kg' => 'pepino-cohombro-12.jpg',
+            'Perejil x manojo' => 'perejil-66.jpg',
+            'Pimentón x kg' => 'pimenton-6.jpg',
+            'Pitahaya x und' => 'pitahaya-30.jpg',
+            'Piña oro miel x und' => 'pina-oro-miel-23.jpg',
+            'Plátano hartón x kg' => 'platano-harton-38.jpg',
+            'Plátano verde x kg' => 'platano-verde-34.jpg',
+            'Queso campesino x 500g' => 'queso-campesino-42.png',
+            'Remolacha x kg' => 'remolacha-13.jpg',
+            'Repollo morado x und' => 'repollo-morado-11.jpg',
+            'Romero x manojo' => 'romero-64.jpg',
+            'Sal marina x kg' => 'sal-marina-61.jpg',
+            'Sandía baby x und' => 'sandia-baby-28.jpg',
+            'Tomate chonto x kg' => 'tomate-chonto-1.jpg',
+            'Tomillo x manojo' => 'tomillo-67.jpg',
+            'Uva isabella x kg' => 'uva-isabella-27.png',
+            'Yogur natural x litro' => 'yogur-natural-45.jpg',
+            'Yuca x kg' => 'yuca-33.jpg',
+            'Zanahoria x kg' => 'zanahoria-3.jpg',
+            'Ñame x kg' => 'name-36.jpg',
+        ];
+        // </imagenes-auto>
 
         // [nombre, descripción, precio COP, stock, categoría]
         $productos = [
@@ -90,15 +182,20 @@ class TiendaSeeder extends Seeder
         ];
 
         foreach ($productos as [$nombre, $desc, $precio, $stock, $cat]) {
-            Producto::firstOrCreate(
+            $p = Producto::firstOrCreate(
                 ['nombre_producto' => $nombre],
                 [
                     'descripcion_producto' => $desc,
                     'precio_producto' => $precio,
                     'cantidad_producto' => $stock,
                     'categoria_id' => $catIds[$cat],
+                    'imagen_producto' => $imagenes[$nombre] ?? null,
                 ]
             );
+            // Filas creadas antes del mapa: rellena imagen sin tocar lo demás
+            if (! $p->imagen_producto && isset($imagenes[$nombre])) {
+                $p->update(['imagen_producto' => $imagenes[$nombre]]);
+            }
         }
     }
 }
