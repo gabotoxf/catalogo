@@ -20,7 +20,7 @@ class PrincipalController extends Controller
 
     public function productos()
     {
-        $productosPorPagina = 10;
+        $productosPorPagina = 24;
         // Optimization: Use select to only get needed columns if possible, but for now just with()
         $productos = Producto::with('categoria:id_categoria,nombre_categoria')
             ->orderBy('id_producto', 'desc')
@@ -44,7 +44,7 @@ class PrincipalController extends Controller
         $query = $request->input('query');
         $categoriaId = $request->input('categoria');
         $sort = $request->input('sort');
-        $productosPorPagina = 12;
+        $productosPorPagina = 24;
 
         $productosQuery = Producto::with('categoria')
             ->whereBetween('precio_producto', [$minPrecio, $maxPrecio]);

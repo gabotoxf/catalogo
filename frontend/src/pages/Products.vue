@@ -19,6 +19,10 @@ const currentPage = ref(1)
 const totalPages = ref(1)
 const inStockOnly = ref(false)
 
+const CACHE_TTL = 5 * 60 * 1000
+const productCache = new Map()
+const categoryCache = { data: null, ts: 0 }
+
 const visibleProducts = computed(() =>
   inStockOnly.value
     ? products.value.filter((p) => (p.cantidad_producto ?? 1) > 0)
@@ -26,9 +30,15 @@ const visibleProducts = computed(() =>
 )
 
 const fetchCategories = async () => {
+  if (categoryCache.data && Date.now() - categoryCache.ts < CACHE_TTL) {
+    categories.value = categoryCache.data
+    return
+  }
   try {
     const res = await api.get('/categorias')
     categories.value = res.data || []
+    categoryCache.data = categories.value
+    categoryCache.ts = Date.now()
   } catch (err) {
     console.error('Error fetching categories', err)
   }
@@ -46,11 +56,21 @@ const fetchData = async (page = 1) => {
       sort: sortOption.value,
       page: page
     }
-    
+    const key = JSON.stringify(params)
+    const cached = productCache.get(key)
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      products.value = cached.products
+      totalPages.value = cached.totalPages
+      loading.value = false
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
     const prodRes = await api.post('/productos/filtrar', params)
-    
+
     products.value = prodRes.data.productos || []
     totalPages.value = prodRes.data.totalPaginas || 1
+    productCache.set(key, { products: products.value, totalPages: totalPages.value, ts: Date.now() })
   } catch (err) {
     console.error('Error fetching data', err)
   } finally {
