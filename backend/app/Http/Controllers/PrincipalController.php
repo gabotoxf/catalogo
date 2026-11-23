@@ -46,7 +46,7 @@ class PrincipalController extends Controller
         $sort = $request->input('sort');
         $productosPorPagina = 24;
 
-        $productosQuery = Producto::with('categoria')
+        $productosQuery = Producto::with('categoria:id_categoria,nombre_categoria')
             ->whereBetween('precio_producto', [$minPrecio, $maxPrecio]);
 
         if ($query) {
@@ -93,7 +93,7 @@ class PrincipalController extends Controller
         // Acepta slug o id (los links viejos con id siguen funcionando).
         // El id solo se compara si es numérico: en Postgres comparar
         // entero con texto da 500.
-        $producto = Producto::with('categoria')
+        $producto = Producto::with('categoria:id_categoria,nombre_categoria')
             ->where('slug_producto', $slug)
             ->when(is_numeric($slug), fn ($q) => $q->orWhere('id_producto', (int) $slug))
             ->first();
