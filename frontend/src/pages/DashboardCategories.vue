@@ -249,7 +249,7 @@ onMounted(fetchCategories)
                 <div class="flex items-center gap-3">
                   <div class="h-10 w-10 rounded-lg overflow-hidden bg-neutral-100 border border-neutral-200 shrink-0 relative flex items-center justify-center">
                     <div v-if="cat.imagen_categoria" class="absolute inset-0 animate-pulse bg-neutral-200"></div>
-                    <img v-if="cat.imagen_categoria" :src="getImageUrl(cat.imagen_categoria)" class="relative h-full w-full object-cover" />
+                    <img v-if="cat.imagen_categoria" :src="getImageUrl(cat.imagen_categoria)" class="relative h-full w-full object-cover" loading="lazy" decoding="async" />
                     <Layers v-else :size="18" class="text-neutral-300" />
                   </div>
                   <span class="font-bold text-neutral-900 text-sm">{{ cat.nombre_categoria }}</span>

@@ -124,7 +124,7 @@ class DashboardController extends Controller
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search');
 
-        $query = Producto::with('categoria')->orderBy('id_producto', 'desc');
+        $query = Producto::with('categoria:id_categoria,nombre_categoria')->orderBy('id_producto', 'desc');
 
         if ($search) {
             $query->where(function($q) use ($search) {
