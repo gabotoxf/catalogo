@@ -22,6 +22,8 @@ watch(() => props.src, () => (loaded.value = false))
       :alt="alt"
       :class="[imgClass, loaded ? 'opacity-100' : 'opacity-0']"
       class="w-full h-full object-cover transition-opacity duration-500"
+      loading="lazy"
+      decoding="async"
       @load="loaded = true"
     />
     <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2 text-brand-300">
