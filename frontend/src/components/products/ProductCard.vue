@@ -24,7 +24,7 @@ const addToCart = () => {
 </script>
 
 <template>
-  <div class="group relative bg-white rounded-3xl border border-brand-100 hover:border-brand-300 transition-all duration-300 hover:shadow-xl hover:shadow-brand-900/5 overflow-hidden">
+  <div class="group relative bg-white rounded-3xl border border-brand-100 hover:border-brand-300 transition-all duration-300 hover:shadow-xl hover:shadow-brand-900/5 overflow-hidden" @mouseenter="prefetchDetail">
     <!-- Image & Badge Container -->
     <div class="relative aspect-[1/1] overflow-hidden bg-brand-50">
       <ProductImage
