@@ -49,6 +49,8 @@ const promos = [
             :src="getAssetUrl(promo.image)" 
             class="w-full h-44 object-cover rounded-2xl mb-6 sm:mb-0 sm:rounded-none sm:absolute sm:top-0 sm:right-0 sm:w-1/2 sm:h-full opacity-80 sm:opacity-60 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none" 
             alt="Promo Decor"
+            loading="lazy"
+            decoding="async"
           />
           
           <div class="absolute top-8 left-8 right-8 h-44 rounded-2xl bg-brand-900/40 pointer-events-none sm:top-0 sm:left-auto sm:right-0 sm:w-1/2 sm:h-full sm:rounded-none sm:bg-transparent sm:bg-gradient-to-l sm:from-brand-900/50 sm:via-brand-900/20 sm:to-transparent"></div>

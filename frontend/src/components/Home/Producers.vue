@@ -45,7 +45,7 @@ const producers = [
           
           <div class="flex flex-col sm:flex-row gap-8 items-center sm:items-start relative z-10">
             <div class="w-32 h-32 shrink-0 rounded-2xl overflow-hidden border-4 border-brand-500/20">
-              <img :src="getAssetUrl(producer.image)" :alt="producer.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+               <img :src="getAssetUrl(producer.image)" :alt="producer.name" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" decoding="async" />
             </div>
             
             <div class="text-center sm:text-left">

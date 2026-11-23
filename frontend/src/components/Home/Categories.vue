@@ -106,6 +106,8 @@ const getImageUrl = (img) => getCategoryImageUrl(img)
               :src="getImageUrl(category.imagen_categoria)"
               :alt="category.nombre_categoria"
               class="relative w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
             />
             <!-- Fallback Professional Icon (Only if no image) -->
             <div v-else class="absolute inset-0 flex items-center justify-center bg-brand-50">
