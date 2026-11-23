@@ -89,11 +89,9 @@ onMounted(() => {
 
         <!-- Logo -->
         <div class="flex items-center gap-3 px-2 pb-8">
-          <div class="w-10 h-10 bg-brand-900 rounded-xl flex items-center justify-center text-white flex-shrink-0">
-            <Store :size="20" />
-          </div>
-          <span class="text-[1.1rem] font-extrabold text-brand-900 tracking-tight">
-            Chaparro Admin
+          <img src="/logo.jfif" alt="Logo" class="h-12 w-12 object-cover rounded-xl shadow-sm flex-shrink-0" />
+          <span class="text-[1.05rem] font-extrabold text-brand-900 tracking-tight leading-tight">
+            Chaparro<br /><span class="text-[0.7rem] font-semibold text-brand-500 uppercase tracking-widest">Ecommerce</span>
           </span>
         </div>
 
@@ -103,8 +101,7 @@ onMounted(() => {
               flex items-center gap-3 px-3.5 py-2.5 rounded-xl
               text-sm font-semibold text-slate-500
               transition-all duration-200
-              hover:bg-brand-50 hover:text-brand-900
-            " :class="isActiveRoute(item) ? 'bg-brand-900 !text-white shadow-lg shadow-brand-900/20' : ''">
+            " :class="isActiveRoute(item) ? 'bg-brand-900 !text-white shadow-lg shadow-brand-900/20 hover:!bg-brand-800' : 'hover:bg-brand-50 hover:text-brand-900'">
             <component :is="item.icon" :size="18" />
             <span>{{ item.name }}</span>
             <ChevronRight v-if="isActiveRoute(item)" :size="14" class="ml-auto opacity-50" />

@@ -30,6 +30,9 @@
     @apply bg-white text-brand-900 antialiased;
     font-family: var(--font-sans);
   }
+  button {
+    @apply cursor-pointer;
+  }
 }
 
 @utility btn {
