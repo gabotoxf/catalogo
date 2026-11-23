@@ -50,7 +50,7 @@ class PrincipalController extends Controller
             ->whereBetween('precio_producto', [$minPrecio, $maxPrecio]);
 
         if ($query) {
-            $productosQuery->where('nombre_producto', 'like', '%' . $query . '%');
+            $productosQuery->whereRaw('LOWER(nombre_producto) LIKE ?', ['%' . strtolower($query) . '%']);
         }
 
         if ($categoriaId) {

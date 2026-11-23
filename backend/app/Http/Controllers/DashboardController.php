@@ -40,7 +40,7 @@ class DashboardController extends Controller
         $query = Categoria::withCount('productos');
 
         if ($search) {
-            $query->where('nombre_categoria', 'like', "%{$search}%");
+            $query->whereRaw('LOWER(nombre_categoria) LIKE ?', ['%' . strtolower($search) . '%']);
         }
 
         return response()->json($query->paginate($perPage));
@@ -128,8 +128,8 @@ class DashboardController extends Controller
 
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('nombre_producto', 'like', "%{$search}%")
-                  ->orWhere('descripcion_producto', 'like', "%{$search}%");
+                $q->whereRaw('LOWER(nombre_producto) LIKE ?', ['%' . strtolower($search) . '%'])
+                  ->orWhereRaw('LOWER(descripcion_producto) LIKE ?', ['%' . strtolower($search) . '%']);
             });
         }
 
