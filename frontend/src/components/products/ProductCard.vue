@@ -2,6 +2,7 @@
 import { ShoppingCart, Eye, Plus } from 'lucide-vue-next'
 import { useCartStore } from '../../stores/cart'
 import ProductImage from './ProductImage.vue'
+import api from '../../api/axios'
 
 const props = defineProps({
   product: {
@@ -11,6 +12,11 @@ const props = defineProps({
 })
 
 const cartStore = useCartStore()
+
+const prefetchDetail = () => {
+  const slug = props.product.slug || props.product.id
+  if (slug) api.get(`/productos/${slug}`).catch(() => {})
+}
 
 const addToCart = () => {
   cartStore.addToCart(props.product)
@@ -46,11 +52,12 @@ const addToCart = () => {
         >
           <Plus :size="24" />
         </button>
-        <RouterLink 
-          :to="{ name: 'product-detail', params: { slug: product.slug || product.id }}"
-          class="w-12 h-12 bg-white text-brand-900 rounded-full shadow-xl flex items-center justify-center hover:bg-brand-900 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
-          title="Ver detalle"
-        >
+          <RouterLink 
+            :to="{ name: 'product-detail', params: { slug: product.slug || product.id }}"
+            @mouseenter="prefetchDetail"
+            class="w-12 h-12 bg-white text-brand-900 rounded-full shadow-xl flex items-center justify-center hover:bg-brand-900 hover:text-white transition-all transform translate-y-4 group-hover:translate-y-0 duration-300"
+            title="Ver detalle"
+          >
           <Eye :size="22" />
         </RouterLink>
       </div>
