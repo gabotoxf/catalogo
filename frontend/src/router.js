@@ -1,15 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { routeLoading } from './utils/routeLoading'
-import Home from './pages/Home.vue'
-import Products from './pages/Products.vue'
-import ProductDetail from './pages/ProductDetail.vue'
-import Login from './pages/Login.vue'
-import Checkout from './pages/Checkout.vue'
-import DashboardLayout from './components/layout/DashboardLayout.vue'
-import DashboardHome from './pages/DashboardHome.vue'
-import DashboardProducts from './pages/DashboardProducts.vue'
-import DashboardCategories from './pages/DashboardCategories.vue'
-import DashboardUsers from './pages/DashboardUsers.vue'
+
+const Home = () => import('./pages/Home.vue')
+const Products = () => import('./pages/Products.vue')
+const ProductDetail = () => import('./pages/ProductDetail.vue')
+const Login = () => import('./pages/Login.vue')
+const Checkout = () => import('./pages/Checkout.vue')
+const DashboardLayout = () => import('./components/layout/DashboardLayout.vue')
+const DashboardHome = () => import('./pages/DashboardHome.vue')
+const DashboardProducts = () => import('./pages/DashboardProducts.vue')
+const DashboardCategories = () => import('./pages/DashboardCategories.vue')
+const DashboardUsers = () => import('./pages/DashboardUsers.vue')
 
 const routes = [
   {
