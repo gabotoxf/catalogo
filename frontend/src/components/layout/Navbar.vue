@@ -112,8 +112,10 @@ onMounted(() => {
       <nav class="max-w-[var(--max-width)] mx-auto px-4 md:px-6 flex items-center justify-between gap-4">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2 shrink-0">
-          <img src="/logo.jfif" alt="Logo" class="h-10 w-10 object-cover rounded shadow-sm" />
-          <span class="text-xl font-black tracking-tighter text-brand-900 uppercase hidden sm:block">Chaparro</span>
+          <img src="/logo.jfif" alt="Logo" class="h-10 w-10 object-cover rounded-lg shadow-sm flex-shrink-0" />
+          <span class="text-[1.05rem] font-extrabold text-brand-900 tracking-tight leading-none hidden sm:block">
+            Chaparro<br /><span class="text-[0.7rem] font-semibold text-brand-500 uppercase tracking-widest leading-none">Ecommerce</span>
+          </span>
         </RouterLink>
 
         <!-- Search (Prominent) -->
@@ -251,7 +253,7 @@ onMounted(() => {
         <!-- Close Button & Logo -->
         <div class="flex items-center justify-between mb-8">
           <RouterLink to="/" class="flex items-center gap-2" @click="isMenuOpen = false">
-            <img src="/logo.jfif" alt="Logo" class="h-10 w-10 object-cover rounded shadow-sm" />
+            <img src="/logo.jfif" alt="Logo" class="h-10 w-10 object-cover rounded shadow-sm" loading="lazy" decoding="async" />
             <span class="text-xl font-black tracking-tighter text-brand-900 uppercase">Chaparro</span>
           </RouterLink>
           <button @click="isMenuOpen = false" class="p-2 bg-brand-50 text-brand-900 rounded-full hover:bg-brand-100 transition-colors">

@@ -396,7 +396,7 @@ onMounted(() => {
               <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-wider ml-1">Imagen</label>
               <div class="flex flex-col gap-3">
                 <div v-if="imagePreview || (form.imagen_producto && typeof form.imagen_producto === 'string')" class="h-24 w-24 rounded-xl overflow-hidden border border-neutral-200 bg-neutral-50 relative group mx-auto sm:mx-0">
-                  <img :src="imagePreview || getImageUrl(form.imagen_producto)" class="h-full w-full object-cover" />
+                  <img :src="imagePreview || getImageUrl(form.imagen_producto)" class="h-full w-full object-cover" loading="lazy" decoding="async" />
                   <button type="button" @click="form.imagen_producto = null; imagePreview = null" class="absolute inset-0 bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <Trash2 :size="16" />
                   </button>

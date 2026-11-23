@@ -12,7 +12,7 @@ const whatsappHref = waLink('Hola Chaparro, quiero hacer un pedido.')
         <!-- Brand & Mission -->
         <div class="space-y-8">
           <RouterLink to="/" class="flex items-center gap-3">
-            <img src="/logo.jfif" alt="Logo" class="h-12 w-12 object-cover rounded-xl shadow-lg shadow-black/20" />
+            <img src="/logo.jfif" alt="Logo" class="h-12 w-12 object-cover rounded-xl shadow-lg shadow-black/20" loading="lazy" decoding="async" />
             <span class="text-2xl font-black tracking-tighter uppercase">Chaparro</span>
           </RouterLink>
           <p class="text-brand-100/70 text-base leading-relaxed font-medium">

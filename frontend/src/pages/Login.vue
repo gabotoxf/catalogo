@@ -86,7 +86,7 @@ const switchMode = (m) => {
     <div class="max-w-md w-full">
       <div class="text-center mb-8">
         <div class="bg-white p-4 rounded-2xl inline-block shadow-sm mb-4">
-          <img src="/logo.jfif" alt="Logo" class="h-16 w-16 object-cover rounded-xl mx-auto" />
+          <img src="/logo.jfif" alt="Logo" class="h-16 w-16 object-cover rounded-xl mx-auto" loading="lazy" decoding="async" />
         </div>
         <h1 class="text-2xl font-bold text-brand-900">{{ mode === 'login' ? 'Iniciar Sesión' : 'Crear cuenta' }}</h1>
         <p class="text-brand-500 text-sm mt-1">{{ mode === 'login' ? 'Accede a tu panel administrativo' : 'Compra directo del campo' }}</p>
